@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>arbitr — Taxonomy Sentry</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --bg-card: #111827;
+      --bg-card-2: #1a2030;
+      --border: #1f2937;
+      --border-soft: #2a3242;
+      --text: #e5e7eb;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --accent: #3b82f6;
+      --accent-soft: #60a5fa;
+      --success: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --pink: #f472b6;
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; }
+    .card-2 { background: var(--bg-card-2); border: 1px solid var(--border-soft); border-radius: 8px; }
+    .pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 500; }
+    .pill-blue { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.25); }
+    .pill-green { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.25); }
+    .pill-amber { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.25); }
+    .pill-rose { background: rgba(244, 63, 94, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.25); }
+    .pill-gray { background: rgba(107, 114, 128, 0.15); color: #d1d5db; border: 1px solid rgba(107, 114, 128, 0.25); }
+    .tab { padding: 10px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px; }
+    .tab:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+    .tab.active { background: rgba(59, 130, 246, 0.12); color: var(--accent-soft); }
+    .stage-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; flex: 1; }
+    .arrow { color: var(--text-dim); font-size: 22px; }
+    .agent-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--bg-card-2); border: 1px solid var(--border-soft); border-radius: 8px; transition: border-color 200ms; }
+    .agent-card:hover { border-color: rgba(59, 130, 246, 0.35); }
+    .agent-icon { width: 32px; height: 32px; border-radius: 7px; background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .tier-locked { opacity: 0.55; }
+    .you-are-here { background: linear-gradient(90deg, rgba(59,130,246,0.12), rgba(59,130,246,0)); border-left: 3px solid var(--accent); }
+    .progress-track { height: 4px; background: var(--border); border-radius: 999px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--accent); transition: width 600ms; }
+    .blink { animation: blink 1.4s infinite; }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+    .fade-in { animation: fade 400ms ease-out; }
+    @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .table-fixed-h { max-height: 480px; overflow-y: auto; }
+    .table-fixed-h::-webkit-scrollbar { width: 8px; }
+    .table-fixed-h::-webkit-scrollbar-thumb { background: var(--border-soft); border-radius: 4px; }
+    .severity-bar { height: 6px; border-radius: 3px; background: var(--border-soft); overflow: hidden; }
+    .approval-row { transition: background 150ms; }
+    .approval-row:hover { background: rgba(255,255,255,0.025); }
+    button.primary { background: var(--accent); color: white; padding: 8px 14px; border-radius: 7px; font-size: 13px; font-weight: 500; transition: background 150ms; }
+    button.primary:hover { background: var(--accent-soft); }
+    button.secondary { background: rgba(255,255,255,0.05); color: var(--text); padding: 8px 14px; border-radius: 7px; font-size: 13px; border: 1px solid var(--border-soft); }
+    button.secondary:hover { background: rgba(255,255,255,0.08); }
+    button.ghost { background: transparent; color: var(--text-muted); padding: 6px 10px; font-size: 12px; }
+    button.ghost:hover { color: var(--text); }
+    .glow { box-shadow: 0 0 0 1px rgba(59,130,246,0.3), 0 0 24px rgba(59,130,246,0.15); }
+    .topbar { background: rgba(10,14,26,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-soft); }
+    .step-dot.done { background: var(--success); }
+    .step-dot.active { background: var(--accent); box-shadow: 0 0 0 4px rgba(59,130,246,0.15); }
+    select, input[type="text"] { background: var(--bg-card-2); border: 1px solid var(--border-soft); color: var(--text); padding: 9px 12px; border-radius: 7px; font-size: 14px; outline: none; }
+    select:focus, input:focus { border-color: var(--accent); }
+    .check-mark { color: var(--success); }
+    .x-mark { color: var(--danger); }
+    .grad-text { background: linear-gradient(90deg, #93c5fd, #f0abfc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ============== TOP BAR ============== -->
+  <header class="topbar sticky top-0 z-30 px-6 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="text-base font-semibold tracking-tight">
+        <span class="grad-text">arbitr</span>
+        <span class="text-gray-500 mx-1">·</span>
+        <span class="text-gray-300">Taxonomy Sentry</span>
+        <span class="pill pill-amber ml-2">BETA</span>
+      </div>
+    </div>
+    <nav class="flex items-center gap-1" id="topnav"></nav>
+    <div class="flex items-center gap-3">
+      <div class="text-xs text-gray-500">Solis Tea · straker-sandbox.bynder.com</div>
+      <span class="pill pill-green"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Connected</span>
+    </div>
+  </header>
+
+  <main id="root" class="max-w-7xl mx-auto px-6 py-8"></main>
+
+  <!-- ============== FOOTER ============== -->
+  <footer class="border-t border-gray-800 mt-16 py-6 px-6">
+    <div class="max-w-7xl mx-auto flex items-center justify-between text-xs text-gray-500">
+      <div>arbitr — Trust &amp; Intelligence Platform · Taxonomy Sentry module</div>
+      <div class="flex items-center gap-4">
+        <span>SOC 2 Type II</span>
+        <span>AES-256 Encryption</span>
+        <span>In-Region Processing</span>
+        <span>GDPR Compliant</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  /* ================================================================
+     EMBEDDED DATA — pulled from live Solis Tea sandbox (straker-sandbox.bynder.com)
+     and the running Paperclip company at /MET/. Real findings from Audit Run v0.
+     ================================================================ */
+  const TENANT = {
+    name: "Solis Tea",
+    url: "straker-sandbox.bynder.com",
+    locales: ["en_US", "de_DE", "fr_FR", "nl_NL", "es_ES"],
+    metaproperty_count: 13,
+    option_count: 96,
+    tuple_count: 308
+  };
+
+  const DETECTED_STATE = {
+    glossary_uploaded: false,
+    audit_baseline: false,
+    discovery_ai: true,
+    tms_connected: false,
+    multi_brand: false
+  };
+
+  const AGENTS = [
+    { id: "lexa", name: "Lexa", role: "Audit Director (CEO)", model: "Claude Sonnet 4.6", trait: "Mission alignment and board-level approvals" },
+    { id: "ops", name: "Ops Director", role: "Operations Coordinator", model: "Claude Sonnet 4.6", trait: "Routes work between specialist agents" },
+    { id: "inventory", name: "Inventory", role: "DAM Snapshot Engineer", model: "Claude Haiku 4.5", trait: "Pulls live taxonomy state from Bynder" },
+    { id: "auditor", name: "Linguistic Auditor", role: "Translation Quality Specialist", model: "Claude Sonnet 4.6", trait: "Verdicts per (option, locale) tuple with citations" },
+    { id: "hierarchy", name: "Hierarchy", role: "Structural Validator", model: "Claude Haiku 4.5", trait: "Parent/child consistency across locales" },
+    { id: "monitor", name: "Drift Monitor", role: "Continuous Sentry", model: "Claude Haiku 4.5", trait: "Catches manual edits that bypass governance" },
+    { id: "reconciliation", name: "Reconciliation Lead", role: "Proposal Synthesizer", model: "Claude Sonnet 4.6", trait: "Bundles findings into approvable change sets" }
+  ];
+
+  /* Real findings — categories match the 9 board-approval tickets in /MET/ */
+  const FINDINGS = [
+    { id: "MET-23", category: "word_sense_error",        label: "Word-sense errors",         count: 14, severity: "high",   sample: "Stock → \"Lager\" (DE) means warehouse stock, should be stock photography",         locales: ["de_DE","nl_NL","es_ES"] },
+    { id: "MET-22", category: "register_mismatch",       label: "Register mismatches",       count: 12, severity: "medium", sample: "Asset Type → \"Tipo de Activo\" (ES) reads as accounting, not marketing register", locales: ["fr_FR","nl_NL","es_ES"] },
+    { id: "MET-21", category: "untranslated",            label: "Untranslated slots",        count: 9,  severity: "medium", sample: "Asset Type / Print / Stock — English copied verbatim into NL and DE slots",         locales: ["de_DE","nl_NL"] },
+    { id: "MET-20", category: "hallucination",           label: "Hallucinated terms",        count: 5,  severity: "high",   sample: "How-To Doc → \"Wie-zu Doc\" (DE) is not a real German construction",                locales: ["de_DE","fr_FR","es_ES","nl_NL"] },
+    { id: "MET-17", category: "compound_error",          label: "DE/NL compound spacing",    count: 4,  severity: "low",    sample: "Campaign Type → \"Campagne Type\" (NL) should be one word: \"Campagnetype\"",         locales: ["nl_NL"] },
+    { id: "MET-18", category: "word_order_error",        label: "Word-order errors",         count: 2,  severity: "low",    sample: "Case Study → \"Caso de Estudio\" (ES) — natural order is \"Estudio de Caso\"",         locales: ["es_ES","nl_NL"] },
+    { id: "MET-19", category: "cross_option_collision",  label: "Cross-option collisions",   count: 2,  severity: "high",   sample: "Both \"Branding\" and \"Logo\" → \"Marca\" (ES) — collision causes search ambiguity", locales: ["es_ES"] },
+    { id: "MET-16", category: "missing",                 label: "Missing values",            count: 3,  severity: "medium", sample: "Industry / Color / Music Track have empty slots in NL and ES",                       locales: ["nl_NL","es_ES"] },
+    { id: "MET-15", category: "taxonomic_error",         label: "Source-data quality",       count: 1,  severity: "medium", sample: "\"Dubai\" classified as a Country option — it's a city",                              locales: ["all"] }
+  ];
+
+  /* Real verdict format — pulled from MET-17 description */
+  const SAMPLE_VERDICT_ROWS = [
+    { mp: "Channel",          option: "Campaign Type",       locale: "nl_NL", current: "Campagne Type",   proposed: "Campagnetype",    rationale: "Dutch orthography: two-element compounds are one word", blast: "Low" },
+    { mp: "Asset_Sub-Type",   option: "Brand Guidelines",    locale: "nl_NL", current: "Merk Richtlijnen",proposed: "Merkrichtlijnen", rationale: "Same Dutch compounding rule",                            blast: "Low" },
+    { mp: "Asset_Sub-Type",   option: "Interview Recording", locale: "nl_NL", current: "Interview Opname",proposed: "Interviewopname", rationale: "Same Dutch compounding rule",                            blast: "Low" },
+    { mp: "Channel_Sub-type", option: "System Integrator",   locale: "nl_NL", current: "Systeem Integrator", proposed: "Systeemintegrator", rationale: "Same Dutch compounding rule",                       blast: "Low" }
+  ];
+
+  const TIERS = [
+    {
+      id: "cold_start",
+      name: "Cold Start — Health Check",
+      headline: "Free taxonomy scan, no glossary, summary findings only",
+      price: "Free",
+      gates: ["Anonymised findings counts", "No specific corrections", "No citations"],
+      unlocks: ["Findings categorised by failure type", "Coverage report per locale", "Detection of source-data quality issues"],
+      next_step: "Upload your brand glossary to unlock Tier 2 — specific, citation-backed corrections",
+      current: true
+    },
+    {
+      id: "with_glossary",
+      name: "Standard — Cleanup Engagement",
+      headline: "Brand glossary as authority, full citations, board approvals",
+      price: "From $30K (one-time)",
+      gates: [],
+      unlocks: ["Full proposal text per finding", "Glossary-backed citations", "Board approval workflow", "Apply-to-Bynder write-back (gated)", "Coverage SLA target"],
+      next_step: "Add continuous monitoring to lock in ongoing alignment",
+      requires: "Brand glossary / termbase uploaded"
+    },
+    {
+      id: "continuous",
+      name: "Sentry — Continuous Monitoring",
+      headline: "Drift detection 24/7, alerts on manual edits, baseline tracking",
+      price: "From $20K/year (subscription)",
+      gates: [],
+      unlocks: ["Daily drift sweeps", "Manual-edit detection", "Trend reporting", "Slack/email alerts on divergence", "Monthly executive briefing"],
+      next_step: "Add Discovery AI integration if your tenant uses it",
+      requires: "Tier 2 completed at least once"
+    },
+    {
+      id: "discovery_ai",
+      name: "Discovery AI Augmentation",
+      headline: "Audit Bynder's auto-tag suggestions per locale",
+      price: "+$15K/year add-on",
+      gates: [],
+      unlocks: ["Locale-aware auto-tag quality scoring", "Suggestion alignment with brand glossary", "Per-asset confidence trace"],
+      next_step: "Bridge to Straker TMS for human-linguist routing",
+      requires: "Bynder Discovery AI active"
+    },
+    {
+      id: "tms_integrated",
+      name: "Straker TMS Integrated",
+      headline: "Findings route to human linguists with TM hits and termbase",
+      price: "Custom — premium tier",
+      gates: [],
+      unlocks: ["TM-leveraged proposals", "Human linguist sign-off per change", "SLA-backed turnaround", "Provenance on every label"],
+      next_step: "Multi-brand platform mode for LSP operators",
+      requires: "Straker TMS connection"
+    },
+    {
+      id: "platform",
+      name: "Platform — Multi-brand LSP",
+      headline: "Many customer brands, one operator dashboard, isolated workspaces",
+      price: "Volume licence",
+      gates: [],
+      unlocks: ["Per-brand isolated workspace", "Account-manager rollup view", "White-label option"],
+      next_step: "—",
+      requires: "LSP operator, more than 5 client brands"
+    }
+  ];
+
+  /* ================================================================
+     ROUTER & APP STATE
+     ================================================================ */
+  let view = "pipeline"; // welcome | probing | tier | pipeline | findings | approvals | tiers | agents
+
+  const TABS = [
+    { id: "pipeline",  label: "Pipeline",   icon: "layout-dashboard" },
+    { id: "findings",  label: "Findings",   icon: "search" },
+    { id: "approvals", label: "Approvals",  icon: "shield-check" },
+    { id: "agents",    label: "Specialists",icon: "users" },
+    { id: "tiers",     label: "Engagement", icon: "trending-up" }
+  ];
+
+  function renderTopnav() {
+    const el = document.getElementById("topnav");
+    el.innerHTML = TABS.map(t => `
+      <a class="tab ${view === t.id ? 'active' : ''}" data-view="${t.id}">
+        <i data-lucide="${t.icon}" class="w-4 h-4"></i>
+        ${t.label}
+      </a>
+    `).join("");
+    el.querySelectorAll(".tab").forEach(a => a.addEventListener("click", () => { view = a.dataset.view; render(); }));
+  }
+
+  /* ================================================================
+     VIEWS
+     ================================================================ */
+  function pillForSeverity(s) {
+    if (s === "high") return '<span class="pill pill-rose">high</span>';
+    if (s === "medium") return '<span class="pill pill-amber">medium</span>';
+    return '<span class="pill pill-gray">low</span>';
+  }
+
+  function renderPipeline() {
+    const total_findings = FINDINGS.reduce((a, b) => a + b.count, 0);
+    return `
+      <div class="fade-in">
+        <!-- Tenant ribbon -->
+        <div class="text-sm text-gray-400 mb-6">
+          <span class="text-gray-300 font-medium">${TENANT.name}</span> is configured for
+          <span class="text-gray-200">${TENANT.locales.slice(1).map(l => l.toUpperCase().split('_')[0]).join(', ')}</span> ·
+          <span class="text-gray-200">Brand DAM</span> · <span class="text-gray-200">Marketing register</span>
+        </div>
+
+        <!-- 3-stage pipeline -->
+        <div class="flex items-stretch gap-4 mb-8">
+          <div class="stage-card">
+            <div class="flex items-center gap-2 mb-2">
+              <i data-lucide="file-input" class="w-4 h-4 text-blue-400"></i>
+              <div class="text-sm font-medium">Content Intake</div>
+            </div>
+            <div class="text-xs text-gray-400 mb-3">Live taxonomy snapshot from Bynder</div>
+            <div class="text-2xl font-semibold">${TENANT.tuple_count}</div>
+            <div class="text-xs text-gray-500">tuples (option × locale)</div>
+            <div class="text-xs text-gray-500 mt-2">${TENANT.metaproperty_count} metaproperties · ${TENANT.option_count} options · ${TENANT.locales.length} locales</div>
+          </div>
+          <div class="arrow self-center">→</div>
+          <div class="stage-card">
+            <div class="flex items-center gap-2 mb-2">
+              <i data-lucide="scan-search" class="w-4 h-4 text-fuchsia-400"></i>
+              <div class="text-sm font-medium">Intelligence Extraction</div>
+            </div>
+            <div class="text-xs text-gray-400 mb-3">Auditor verdicts with citations</div>
+            <div class="text-2xl font-semibold">${total_findings}</div>
+            <div class="text-xs text-gray-500">failures across 9 categories</div>
+            <div class="text-xs text-gray-500 mt-2">${FINDINGS.filter(f=>f.severity==='high').reduce((a,b)=>a+b.count,0)} high · ${FINDINGS.filter(f=>f.severity==='medium').reduce((a,b)=>a+b.count,0)} medium · ${FINDINGS.filter(f=>f.severity==='low').reduce((a,b)=>a+b.count,0)} low</div>
+          </div>
+          <div class="arrow self-center">→</div>
+          <div class="stage-card">
+            <div class="flex items-center gap-2 mb-2">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+              <div class="text-sm font-medium">Trusted Output</div>
+            </div>
+            <div class="text-xs text-gray-400 mb-3">Board approval queue · zero auto-writes</div>
+            <div class="text-2xl font-semibold">${FINDINGS.length}</div>
+            <div class="text-xs text-gray-500">change-set proposals awaiting board</div>
+            <div class="text-xs text-gray-500 mt-2">0 writes applied to Bynder yet — HITL enforced</div>
+          </div>
+        </div>
+
+        <!-- Tier-status banner -->
+        <div class="card p-5 mb-6">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="text-xs text-gray-500 uppercase tracking-wide mb-1">Your current tier</div>
+              <div class="text-lg font-semibold mb-1">Cold Start — Health Check <span class="pill pill-blue ml-2">Free</span></div>
+              <div class="text-sm text-gray-400">Based on your tenant: no glossary detected, no audit baseline, Discovery AI active. You're seeing anonymised counts and category breakdowns. Specific corrections and citations are gated until you upload a brand glossary.</div>
+            </div>
+            <button class="primary self-start" onclick="view='tiers'; render();">See engagement tiers →</button>
+          </div>
+        </div>
+
+        <!-- Two-column: findings preview + agent ensemble -->
+        <div class="grid grid-cols-3 gap-4">
+          <div class="col-span-2 card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <div class="text-sm font-semibold text-gray-200">Findings by category</div>
+              <button class="ghost" onclick="view='findings'; render();">View all →</button>
+            </div>
+            <div class="space-y-3">
+              ${FINDINGS.map(f => `
+                <div class="flex items-center justify-between text-sm">
+                  <div class="flex items-center gap-3">
+                    ${pillForSeverity(f.severity)}
+                    <div class="text-gray-200">${f.label}</div>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div class="text-gray-400 text-xs">${f.locales.join(', ')}</div>
+                    <div class="text-gray-200 font-medium w-8 text-right">${f.count}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <div class="text-sm font-semibold text-gray-200">Specialist agents</div>
+              <button class="ghost" onclick="view='agents'; render();">All →</button>
+            </div>
+            <div class="space-y-2">
+              ${AGENTS.slice(0, 4).map(a => `
+                <div class="flex items-start gap-3">
+                  <div class="agent-icon"><i data-lucide="bot" class="w-4 h-4 text-blue-400"></i></div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-medium">${a.name}</div>
+                    <div class="text-xs text-gray-400 truncate">${a.role}</div>
+                  </div>
+                </div>
+              `).join('')}
+              <div class="text-xs text-gray-500 pt-2 border-t border-gray-800">7 specialist agents · ${AGENTS.filter(a=>a.model.includes('Sonnet')).length} Sonnet, ${AGENTS.filter(a=>a.model.includes('Haiku')).length} Haiku</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trust + Org Brain row -->
+        <div class="grid grid-cols-2 gap-4 mt-6">
+          <div class="card p-5">
+            <div class="text-sm font-semibold text-gray-200 mb-3">Your Org Brain</div>
+            <div class="text-xs text-gray-400 mb-4">Knowledge bases that compound with every audit. Empty until you upload your brand glossary.</div>
+            <div class="grid grid-cols-3 gap-3 text-center">
+              <div class="card-2 p-3"><div class="text-lg font-semibold text-gray-500">0</div><div class="text-xs text-gray-500">Glossary terms</div></div>
+              <div class="card-2 p-3"><div class="text-lg font-semibold text-gray-500">0</div><div class="text-xs text-gray-500">TM segments</div></div>
+              <div class="card-2 p-3"><div class="text-lg font-semibold text-gray-500">0</div><div class="text-xs text-gray-500">Do-not-translate</div></div>
+            </div>
+            <button class="secondary w-full mt-4">Upload brand glossary →</button>
+          </div>
+
+          <div class="card p-5">
+            <div class="text-sm font-semibold text-gray-200 mb-3">How an audit run works</div>
+            <div class="text-xs text-gray-400 mb-4">Seven steps from snapshot to verified proposal. Full transparency, citation-backed at every stage.</div>
+            <div class="space-y-2 text-xs">
+              <div class="flex items-center gap-2"><div class="step-dot done"></div><div>Inventory snapshot — pull live taxonomy from Bynder</div></div>
+              <div class="flex items-center gap-2"><div class="step-dot done"></div><div>Drift baseline — compare against last snapshot</div></div>
+              <div class="flex items-center gap-2"><div class="step-dot done"></div><div>Hierarchy validation — parent/child consistency</div></div>
+              <div class="flex items-center gap-2"><div class="step-dot done"></div><div>Linguistic audit — verdicts per (option, locale)</div></div>
+              <div class="flex items-center gap-2"><div class="step-dot done"></div><div>Reconciliation — bundle findings into change sets</div></div>
+              <div class="flex items-center gap-2"><div class="step-dot done"></div><div>Board approval — every write gated by human review</div></div>
+              <div class="flex items-center gap-2"><div class="step-dot"></div><div class="text-gray-500">Apply to Bynder — only after board approval (gated in Cold Start)</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderFindings() {
+    return `
+      <div class="fade-in">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <div class="text-xl font-semibold">Findings — Audit Run v0</div>
+            <div class="text-sm text-gray-400">Live snapshot · ${TENANT.tuple_count} tuples audited · ${FINDINGS.reduce((a,b)=>a+b.count,0)} failures across ${FINDINGS.length} categories</div>
+          </div>
+          <button class="secondary"><i data-lucide="download" class="w-4 h-4 inline"></i> Export findings</button>
+        </div>
+
+        <div class="card overflow-hidden">
+          <table class="w-full text-sm">
+            <thead class="text-xs text-gray-400 bg-black/20">
+              <tr>
+                <th class="text-left px-4 py-3">Category</th>
+                <th class="text-left px-4 py-3">Severity</th>
+                <th class="text-left px-4 py-3">Count</th>
+                <th class="text-left px-4 py-3">Locales affected</th>
+                <th class="text-left px-4 py-3">Sample finding</th>
+                <th class="text-left px-4 py-3">Ticket</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${FINDINGS.map(f => `
+                <tr class="border-t border-gray-800 approval-row">
+                  <td class="px-4 py-3 font-medium">${f.label}</td>
+                  <td class="px-4 py-3">${pillForSeverity(f.severity)}</td>
+                  <td class="px-4 py-3 text-gray-300">${f.count}</td>
+                  <td class="px-4 py-3 text-xs text-gray-400">${f.locales.join(', ')}</td>
+                  <td class="px-4 py-3 text-xs text-gray-300">${f.sample}</td>
+                  <td class="px-4 py-3 text-xs text-gray-500 font-mono">${f.id}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card p-5 mt-6">
+          <div class="text-sm font-semibold text-gray-200 mb-2">Why these specific categories?</div>
+          <div class="text-xs text-gray-400 leading-relaxed">
+            The Linguistic Auditor checks every (option, locale) tuple against general translation knowledge plus cross-option consistency. In Cold Start mode, you see categorised counts. With a brand glossary loaded, each finding becomes a full proposal with the proposed correction, rationale, and a blast-radius estimate — citation-backed against your termbase. Upgrade to Standard to unlock the per-finding detail.
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderApprovals() {
+    return `
+      <div class="fade-in">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <div class="text-xl font-semibold">Board Approval Queue</div>
+            <div class="text-sm text-gray-400">${FINDINGS.length} change-set proposals awaiting your sign-off · zero writes applied to Bynder</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="pill pill-amber">HITL Enforced</span>
+          </div>
+        </div>
+
+        <!-- Locked overlay for cold-start: we show one real verdict, gate the rest -->
+        <div class="card overflow-hidden mb-6">
+          <div class="px-5 py-4 border-b border-gray-800 flex items-center justify-between">
+            <div>
+              <div class="text-sm font-semibold">MET-17 · Board approval: fix compound_error in nl_NL — 4 options</div>
+              <div class="text-xs text-gray-400 mt-1">Filed by Reconciliation Lead · severity Low · blast radius Low</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="secondary">Reject</button>
+              <button class="primary">Approve all 4</button>
+            </div>
+          </div>
+          <table class="w-full text-sm">
+            <thead class="text-xs text-gray-400 bg-black/20">
+              <tr>
+                <th class="text-left px-4 py-2.5">Metaproperty</th>
+                <th class="text-left px-4 py-2.5">Option</th>
+                <th class="text-left px-4 py-2.5">Locale</th>
+                <th class="text-left px-4 py-2.5">Current</th>
+                <th class="text-left px-4 py-2.5">Proposed</th>
+                <th class="text-left px-4 py-2.5">Rationale</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${SAMPLE_VERDICT_ROWS.map(r => `
+                <tr class="border-t border-gray-800 approval-row">
+                  <td class="px-4 py-3 text-xs text-gray-300">${r.mp}</td>
+                  <td class="px-4 py-3 text-xs text-gray-300">${r.option}</td>
+                  <td class="px-4 py-3"><span class="pill pill-blue">${r.locale}</span></td>
+                  <td class="px-4 py-3 text-xs text-gray-400 font-mono">${r.current}</td>
+                  <td class="px-4 py-3 text-xs text-emerald-300 font-mono">${r.proposed}</td>
+                  <td class="px-4 py-3 text-xs text-gray-400">${r.rationale}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Gated tickets -->
+        <div class="text-xs text-gray-500 uppercase tracking-wide mb-2">${FINDINGS.length - 1} more change sets — gated in Cold Start</div>
+        <div class="space-y-2 tier-locked">
+          ${FINDINGS.filter(f => f.id !== "MET-17").map(f => `
+            <div class="card-2 px-4 py-3 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <i data-lucide="lock" class="w-3.5 h-3.5 text-gray-500"></i>
+                <div>
+                  <div class="text-sm">${f.id} · ${f.label}</div>
+                  <div class="text-xs text-gray-500">${f.count} ${f.count === 1 ? 'instance' : 'instances'} · ${f.locales.join(', ')}</div>
+                </div>
+              </div>
+              <span class="pill pill-gray">requires glossary</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="mt-6 p-5 card glow">
+          <div class="text-sm font-semibold mb-2">Unlock all change sets</div>
+          <div class="text-sm text-gray-400 mb-4">Upload your brand glossary to give the Auditor an authority source. Every proposal becomes citation-backed, the apply-to-Bynder gate opens, and your dedicated cleanup engagement begins.</div>
+          <button class="primary">Upload brand glossary →</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderAgents() {
+    return `
+      <div class="fade-in">
+        <div class="text-xl font-semibold mb-1">Your specialist agent ensemble</div>
+        <div class="text-sm text-gray-400 mb-6">Matched to Solis Tea's workspace · running on Paperclip orchestration · governance and budget enforced per agent</div>
+
+        <div class="grid grid-cols-2 gap-3">
+          ${AGENTS.map(a => `
+            <div class="agent-card">
+              <div class="agent-icon"><i data-lucide="bot" class="w-5 h-5 text-blue-400"></i></div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <div class="font-semibold text-gray-200">${a.name}</div>
+                  <span class="pill ${a.model.includes('Sonnet') ? 'pill-blue' : 'pill-gray'}">${a.model.split(' ').slice(-2).join(' ')}</span>
+                </div>
+                <div class="text-xs text-blue-300 mb-1">${a.role}</div>
+                <div class="text-xs text-gray-400">${a.trait}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="card p-5 mt-6">
+          <div class="text-sm font-semibold mb-2">How the ensemble works</div>
+          <div class="text-xs text-gray-400 leading-relaxed">
+            Lexa (CEO) routes the mission. Ops Director coordinates day-to-day. Inventory snapshots the Bynder state. Auditor produces verdicts. Hierarchy checks structural integrity. Reconciliation bundles findings. Monitor watches for drift between runs. Every action is traced, every cost is tracked, every change requires board approval. This is the moat — not the model, the governance.
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderTiers() {
+    return `
+      <div class="fade-in">
+        <div class="text-xl font-semibold mb-1">Engagement Tiers</div>
+        <div class="text-sm text-gray-400 mb-6">Your tier is determined by what we detect in your tenant. Unlock the next tier by closing the gap on the right.</div>
+
+        <div class="space-y-3">
+          ${TIERS.map((t, i) => `
+            <div class="card p-5 ${t.current ? 'you-are-here' : ''} ${i > 0 && !t.current ? 'tier-locked' : ''}">
+              <div class="flex items-start justify-between gap-6">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-1">
+                    <div class="text-base font-semibold">${t.name}</div>
+                    ${t.current ? '<span class="pill pill-blue">you are here</span>' : ''}
+                  </div>
+                  <div class="text-sm text-gray-400 mb-3">${t.headline}</div>
+                  ${t.requires ? `<div class="text-xs text-gray-500 mb-2"><i data-lucide="key" class="w-3 h-3 inline"></i> Requires: ${t.requires}</div>` : ''}
+                  <div class="grid grid-cols-2 gap-4 mt-3">
+                    <div>
+                      <div class="text-xs uppercase tracking-wide text-gray-500 mb-1">What unlocks</div>
+                      <ul class="text-xs text-gray-300 space-y-1">
+                        ${t.unlocks.map(u => `<li class="flex items-start gap-1.5"><i data-lucide="check" class="w-3 h-3 text-emerald-400 mt-0.5 flex-shrink-0"></i> ${u}</li>`).join('')}
+                      </ul>
+                    </div>
+                    <div>
+                      ${t.gates.length ? `
+                        <div class="text-xs uppercase tracking-wide text-gray-500 mb-1">What's gated</div>
+                        <ul class="text-xs text-gray-400 space-y-1">
+                          ${t.gates.map(g => `<li class="flex items-start gap-1.5"><i data-lucide="lock" class="w-3 h-3 text-gray-500 mt-0.5 flex-shrink-0"></i> ${g}</li>`).join('')}
+                        </ul>
+                      ` : `
+                        <div class="text-xs uppercase tracking-wide text-gray-500 mb-1">Upsell path</div>
+                        <div class="text-xs text-gray-400">${t.next_step}</div>
+                      `}
+                    </div>
+                  </div>
+                </div>
+                <div class="text-right flex-shrink-0">
+                  <div class="text-xs text-gray-500 uppercase tracking-wide mb-1">Pricing</div>
+                  <div class="text-sm font-semibold text-gray-200">${t.price}</div>
+                  ${!t.current ? `<button class="secondary mt-3 text-xs">Request upgrade</button>` : ''}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="card p-5 mt-6">
+          <div class="text-sm font-semibold mb-2">Same engine, different gates</div>
+          <div class="text-xs text-gray-400 leading-relaxed">
+            Every tier runs against the same Taxonomy Sentry engine. Cold Start sees categorised counts; Standard sees per-finding proposals with glossary citations; Sentry adds continuous drift detection; TMS-Integrated routes through human linguists. Upgrading isn't about more software — it's about expanding what the agents are allowed to show you, propose, and act on. Human-in-the-loop stays throughout. It's the moat.
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  /* ================================================================
+     MAIN RENDER
+     ================================================================ */
+  function render() {
+    renderTopnav();
+    const root = document.getElementById("root");
+    if (view === "pipeline")       root.innerHTML = renderPipeline();
+    else if (view === "findings")  root.innerHTML = renderFindings();
+    else if (view === "approvals") root.innerHTML = renderApprovals();
+    else if (view === "agents")    root.innerHTML = renderAgents();
+    else if (view === "tiers")     root.innerHTML = renderTiers();
+    lucide.createIcons();
+  }
+
+  render();
+  </script>
+</body>
+</html>
