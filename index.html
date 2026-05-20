@@ -1,103 +1,308 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>arbitr — Taxonomy Sentry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
+    /* ============ DESIGN TOKENS (light theme, mimics NotVerify) ============ */
     :root {
-      --bg: #0a0e1a;
-      --bg-card: #111827;
-      --bg-card-2: #1a2030;
-      --border: #1f2937;
-      --border-soft: #2a3242;
-      --text: #e5e7eb;
-      --text-muted: #9ca3af;
-      --text-dim: #6b7280;
-      --accent: #3b82f6;
-      --accent-soft: #60a5fa;
-      --success: #10b981;
-      --warn: #f59e0b;
-      --danger: #ef4444;
-      --pink: #f472b6;
+      --bg-page: #FAF9F6;
+      --bg-card: #FFFFFF;
+      --bg-card-tint: #F7F8FA;
+      --bg-hero: #EEF3FB;
+      --border: #ECECE6;
+      --border-soft: #F0EFE9;
+      --text: #1A1A1A;
+      --text-2: #4B4B4B;
+      --text-muted: #8A8A87;
+      --text-dim: #B5B5B0;
+      --accent: #2563EB;
+      --accent-soft: #E5EEF7;
+      --cta: #E89A4F;
+      --cta-hover: #D68A3E;
+      --success: #10B981;
+      --success-soft: #D1FADF;
+      --warn: #F59E0B;
+      --warn-soft: #FEF3C7;
+      --danger: #DC2626;
+      --danger-soft: #FEE2E2;
+      --info-soft: #DBEAFE;
+      --purple-soft: #EDE9FE;
     }
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; }
-    .card-2 { background: var(--bg-card-2); border: 1px solid var(--border-soft); border-radius: 8px; }
-    .pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 500; }
-    .pill-blue { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.25); }
-    .pill-green { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.25); }
-    .pill-amber { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.25); }
-    .pill-rose { background: rgba(244, 63, 94, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.25); }
-    .pill-gray { background: rgba(107, 114, 128, 0.15); color: #d1d5db; border: 1px solid rgba(107, 114, 128, 0.25); }
-    .tab { padding: 10px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px; }
-    .tab:hover { background: rgba(255,255,255,0.04); color: var(--text); }
-    .tab.active { background: rgba(59, 130, 246, 0.12); color: var(--accent-soft); }
-    .stage-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; flex: 1; }
-    .arrow { color: var(--text-dim); font-size: 22px; }
-    .agent-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--bg-card-2); border: 1px solid var(--border-soft); border-radius: 8px; transition: border-color 200ms; }
-    .agent-card:hover { border-color: rgba(59, 130, 246, 0.35); }
-    .agent-icon { width: 32px; height: 32px; border-radius: 7px; background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .tier-locked { opacity: 0.55; }
-    .you-are-here { background: linear-gradient(90deg, rgba(59,130,246,0.12), rgba(59,130,246,0)); border-left: 3px solid var(--accent); }
-    .progress-track { height: 4px; background: var(--border); border-radius: 999px; overflow: hidden; }
-    .progress-fill { height: 100%; background: var(--accent); transition: width 600ms; }
-    .blink { animation: blink 1.4s infinite; }
-    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
-    .fade-in { animation: fade 400ms ease-out; }
-    @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    .table-fixed-h { max-height: 480px; overflow-y: auto; }
-    .table-fixed-h::-webkit-scrollbar { width: 8px; }
-    .table-fixed-h::-webkit-scrollbar-thumb { background: var(--border-soft); border-radius: 4px; }
-    .severity-bar { height: 6px; border-radius: 3px; background: var(--border-soft); overflow: hidden; }
-    .approval-row { transition: background 150ms; }
-    .approval-row:hover { background: rgba(255,255,255,0.025); }
-    button.primary { background: var(--accent); color: white; padding: 8px 14px; border-radius: 7px; font-size: 13px; font-weight: 500; transition: background 150ms; }
-    button.primary:hover { background: var(--accent-soft); }
-    button.secondary { background: rgba(255,255,255,0.05); color: var(--text); padding: 8px 14px; border-radius: 7px; font-size: 13px; border: 1px solid var(--border-soft); }
-    button.secondary:hover { background: rgba(255,255,255,0.08); }
-    button.ghost { background: transparent; color: var(--text-muted); padding: 6px 10px; font-size: 12px; }
-    button.ghost:hover { color: var(--text); }
-    .glow { box-shadow: 0 0 0 1px rgba(59,130,246,0.3), 0 0 24px rgba(59,130,246,0.15); }
-    .topbar { background: rgba(10,14,26,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
-    .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-soft); }
+
+    /* Bynder OEM mode — flips palette */
+    html[data-mode="bynder"] {
+      --bg-page: #FAFBFC;
+      --bg-card: #FFFFFF;
+      --bg-hero: #EFF6FF;
+      --accent: #1E5BC6;
+      --accent-soft: #DDE9FB;
+      --cta: #1E5BC6;
+      --cta-hover: #1849A8;
+    }
+
+    * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body {
+      background: var(--bg-page);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+    }
+
+    /* ============ TOPBAR ============ */
+    .topbar {
+      background: var(--bg-page);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; font-weight: 600; }
+    .brand-mark {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: var(--accent);
+      display: inline-flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 13px;
+    }
+    html[data-mode="bynder"] .brand-mark { background: var(--accent); }
+    .brand-divider { color: var(--text-dim); font-weight: 400; margin: 0 2px; }
+    .brand-tenant { color: var(--text-2); font-weight: 400; font-size: 14px; }
+
+    /* ============ TAB NAV ============ */
+    .nav-row {
+      padding: 0 32px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-page);
+    }
+    .tab {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 12px 14px;
+      font-size: 13.5px; font-weight: 500;
+      color: var(--text-2);
+      cursor: pointer;
+      border-radius: 7px;
+      margin-bottom: 4px; margin-top: 4px;
+      transition: background 120ms, color 120ms;
+    }
+    .tab:hover { background: var(--border-soft); color: var(--text); }
+    .tab.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    /* ============ STATUS PILLS ============ */
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px;
+      background: var(--success-soft);
+      border-radius: 999px;
+      font-size: 12px; font-weight: 500;
+      color: #047857;
+    }
+    .status-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+
+    .mode-toggle {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 11.5px; color: var(--text-muted);
+      cursor: pointer;
+    }
+    .mode-toggle:hover { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+
+    /* ============ CARDS ============ */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .card-hover { transition: border-color 120ms, transform 120ms; }
+    .card-hover:hover { border-color: var(--accent); }
+
+    .card-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 20px 22px;
+    }
+    .icon-tile {
+      width: 40px; height: 40px; border-radius: 9px;
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .icon-tile.blue { background: var(--info-soft); color: var(--accent); }
+    .icon-tile.green { background: var(--success-soft); color: #047857; }
+    .icon-tile.amber { background: var(--warn-soft); color: #B45309; }
+    .icon-tile.purple { background: var(--purple-soft); color: #7C3AED; }
+    .icon-tile.gray { background: var(--border-soft); color: var(--text-muted); }
+
+    .card-title { font-weight: 600; color: var(--text); font-size: 14.5px; margin-bottom: 2px; }
+    .card-desc { color: var(--text-muted); font-size: 13px; line-height: 1.5; }
+    .chev-right { color: var(--text-dim); }
+
+    /* ============ HERO BANNER ============ */
+    .hero {
+      background: var(--bg-hero);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 26px;
+    }
+    .cta-btn {
+      background: var(--cta);
+      color: white;
+      font-weight: 500;
+      font-size: 13.5px;
+      padding: 9px 16px;
+      border-radius: 8px;
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: background 120ms;
+    }
+    .cta-btn:hover { background: var(--cta-hover); }
+    .ghost-btn {
+      background: transparent;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 0;
+    }
+    .ghost-btn:hover { text-decoration: underline; }
+
+    .secondary-btn {
+      background: var(--bg-card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 7px;
+    }
+    .secondary-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ============ PIPELINE STAGE ============ */
+    .stage-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      flex: 1;
+    }
+    .stage-title { font-weight: 600; font-size: 14px; color: var(--text); }
+    .stage-meta { color: var(--text-muted); font-size: 11.5px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 8px; }
+    .arrow-sep { color: var(--text-dim); font-size: 18px; align-self: center; }
+
+    /* ============ SEVERITY PILLS ============ */
+    .sev-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 500; }
+    .sev-high { background: var(--danger-soft); color: var(--danger); }
+    .sev-medium { background: var(--warn-soft); color: #B45309; }
+    .sev-low { background: var(--accent-soft); color: var(--accent); }
+    .lock-pill { background: var(--border-soft); color: var(--text-muted); }
+
+    /* ============ LAYOUT ============ */
+    .container { max-width: 1280px; margin: 0 auto; padding: 28px 32px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+    /* ============ TABLES ============ */
+    .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .data-table th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 14px 18px;
+      background: var(--bg-card-tint);
+      border-bottom: 1px solid var(--border);
+    }
+    .data-table td {
+      padding: 14px 18px;
+      font-size: 13px;
+      color: var(--text-2);
+      border-bottom: 1px solid var(--border);
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: var(--bg-card-tint); }
+    .mono { font-family: 'SF Mono', Menlo, Consolas, monospace; font-size: 12px; }
+
+    /* ============ FOOTER ============ */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 22px 32px;
+      margin-top: 60px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+    footer .trust-row { display: flex; gap: 18px; }
+
+    /* ============ MISC ============ */
+    .step-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); display: inline-block; }
     .step-dot.done { background: var(--success); }
-    .step-dot.active { background: var(--accent); box-shadow: 0 0 0 4px rgba(59,130,246,0.15); }
-    select, input[type="text"] { background: var(--bg-card-2); border: 1px solid var(--border-soft); color: var(--text); padding: 9px 12px; border-radius: 7px; font-size: 14px; outline: none; }
-    select:focus, input:focus { border-color: var(--accent); }
-    .check-mark { color: var(--success); }
-    .x-mark { color: var(--danger); }
-    .grad-text { background: linear-gradient(90deg, #93c5fd, #f0abfc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .step-dot.next { background: var(--text-dim); }
+    .you-are-here { box-shadow: 0 0 0 2px var(--accent); }
+    .fade-in { animation: fade 240ms ease-out; }
+    @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .subhead {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .locked { opacity: 0.55; }
+    .lock-overlay {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; color: var(--text-muted);
+    }
+    .scope-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: 6px;
+      letter-spacing: 0.02em;
+    }
   </style>
 </head>
-<body class="min-h-screen">
+<body>
 
-  <!-- ============== TOP BAR ============== -->
-  <header class="topbar sticky top-0 z-30 px-6 py-3 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="text-base font-semibold tracking-tight">
-        <span class="grad-text">arbitr</span>
-        <span class="text-gray-500 mx-1">·</span>
-        <span class="text-gray-300">Taxonomy Sentry</span>
-        <span class="pill pill-amber ml-2">BETA</span>
+  <!-- ================ TOPBAR ================ -->
+  <header class="topbar">
+    <div style="max-width: 1280px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;">
+      <div class="brand" id="brand-block">
+        <!-- populated by applyMode -->
       </div>
-    </div>
-    <nav class="flex items-center gap-1" id="topnav"></nav>
-    <div class="flex items-center gap-3">
-      <div class="text-xs text-gray-500">Solis Tea · straker-sandbox.bynder.com</div>
-      <span class="pill pill-green"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Connected</span>
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <button class="mode-toggle" id="mode-toggle" title="Switch between standalone and Bynder-embedded view">
+          <i data-lucide="arrow-left-right" class="w-3 h-3"></i>
+          <span id="mode-label">arbitr standalone</span>
+        </button>
+        <span class="status-pill"><span class="dot"></span>All Systems Operational</span>
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-soft); display: inline-flex; align-items: center; justify-content: center; color: var(--accent); font-weight: 600; font-size: 12px;">LK</div>
+      </div>
     </div>
   </header>
 
-  <main id="root" class="max-w-7xl mx-auto px-6 py-8"></main>
+  <!-- ================ TAB NAV ================ -->
+  <div class="nav-row">
+    <div style="max-width: 1280px; margin: 0 auto; display: flex; gap: 6px;" id="topnav"></div>
+  </div>
 
-  <!-- ============== FOOTER ============== -->
-  <footer class="border-t border-gray-800 mt-16 py-6 px-6">
-    <div class="max-w-7xl mx-auto flex items-center justify-between text-xs text-gray-500">
-      <div>arbitr — Trust &amp; Intelligence Platform · Taxonomy Sentry module</div>
-      <div class="flex items-center gap-4">
+  <!-- ================ MAIN ================ -->
+  <main id="root" class="container"></main>
+
+  <!-- ================ FOOTER ================ -->
+  <footer>
+    <div style="max-width: 1280px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between;">
+      <div id="footer-brand">arbitr — Trust &amp; Intelligence Platform · Taxonomy Sentry module</div>
+      <div class="trust-row">
         <span>SOC 2 Type II</span>
         <span>AES-256 Encryption</span>
         <span>In-Region Processing</span>
@@ -108,8 +313,7 @@
 
   <script>
   /* ================================================================
-     EMBEDDED DATA — pulled from live Solis Tea sandbox (straker-sandbox.bynder.com)
-     and the running Paperclip company at /MET/. Real findings from Audit Run v0.
+     EMBEDDED DATA — real values from the Solis Tea sandbox + audit
      ================================================================ */
   const TENANT = {
     name: "Solis Tea",
@@ -120,267 +324,308 @@
     tuple_count: 308
   };
 
-  const DETECTED_STATE = {
-    glossary_uploaded: false,
-    audit_baseline: false,
-    discovery_ai: true,
-    tms_connected: false,
-    multi_brand: false
-  };
-
-  const AGENTS = [
-    { id: "lexa", name: "Lexa", role: "Audit Director (CEO)", model: "Claude Sonnet 4.6", trait: "Mission alignment and board-level approvals" },
-    { id: "ops", name: "Ops Director", role: "Operations Coordinator", model: "Claude Sonnet 4.6", trait: "Routes work between specialist agents" },
-    { id: "inventory", name: "Inventory", role: "DAM Snapshot Engineer", model: "Claude Haiku 4.5", trait: "Pulls live taxonomy state from Bynder" },
-    { id: "auditor", name: "Linguistic Auditor", role: "Translation Quality Specialist", model: "Claude Sonnet 4.6", trait: "Verdicts per (option, locale) tuple with citations" },
-    { id: "hierarchy", name: "Hierarchy", role: "Structural Validator", model: "Claude Haiku 4.5", trait: "Parent/child consistency across locales" },
-    { id: "monitor", name: "Drift Monitor", role: "Continuous Sentry", model: "Claude Haiku 4.5", trait: "Catches manual edits that bypass governance" },
-    { id: "reconciliation", name: "Reconciliation Lead", role: "Proposal Synthesizer", model: "Claude Sonnet 4.6", trait: "Bundles findings into approvable change sets" }
-  ];
-
-  /* Real findings — categories match the 9 board-approval tickets in /MET/ */
   const FINDINGS = [
-    { id: "MET-23", category: "word_sense_error",        label: "Word-sense errors",         count: 14, severity: "high",   sample: "Stock → \"Lager\" (DE) means warehouse stock, should be stock photography",         locales: ["de_DE","nl_NL","es_ES"] },
-    { id: "MET-22", category: "register_mismatch",       label: "Register mismatches",       count: 12, severity: "medium", sample: "Asset Type → \"Tipo de Activo\" (ES) reads as accounting, not marketing register", locales: ["fr_FR","nl_NL","es_ES"] },
-    { id: "MET-21", category: "untranslated",            label: "Untranslated slots",        count: 9,  severity: "medium", sample: "Asset Type / Print / Stock — English copied verbatim into NL and DE slots",         locales: ["de_DE","nl_NL"] },
-    { id: "MET-20", category: "hallucination",           label: "Hallucinated terms",        count: 5,  severity: "high",   sample: "How-To Doc → \"Wie-zu Doc\" (DE) is not a real German construction",                locales: ["de_DE","fr_FR","es_ES","nl_NL"] },
-    { id: "MET-17", category: "compound_error",          label: "DE/NL compound spacing",    count: 4,  severity: "low",    sample: "Campaign Type → \"Campagne Type\" (NL) should be one word: \"Campagnetype\"",         locales: ["nl_NL"] },
-    { id: "MET-18", category: "word_order_error",        label: "Word-order errors",         count: 2,  severity: "low",    sample: "Case Study → \"Caso de Estudio\" (ES) — natural order is \"Estudio de Caso\"",         locales: ["es_ES","nl_NL"] },
-    { id: "MET-19", category: "cross_option_collision",  label: "Cross-option collisions",   count: 2,  severity: "high",   sample: "Both \"Branding\" and \"Logo\" → \"Marca\" (ES) — collision causes search ambiguity", locales: ["es_ES"] },
-    { id: "MET-16", category: "missing",                 label: "Missing values",            count: 3,  severity: "medium", sample: "Industry / Color / Music Track have empty slots in NL and ES",                       locales: ["nl_NL","es_ES"] },
-    { id: "MET-15", category: "taxonomic_error",         label: "Source-data quality",       count: 1,  severity: "medium", sample: "\"Dubai\" classified as a Country option — it's a city",                              locales: ["all"] }
+    { id: "F-01", category: "word_sense_error",        label: "Wrong meaning",              count: 14, severity: "high",   sample: "“Stock” → “Lager” (DE) means warehouse stock; in context it should mean stock photography.",          locales: ["de_DE","nl_NL","es_ES"] },
+    { id: "F-02", category: "register_mismatch",       label: "Wrong tone",                 count: 12, severity: "medium", sample: "“Asset Type” → “Tipo de Activo” (ES) reads as accounting language, not marketing register.",       locales: ["fr_FR","nl_NL","es_ES"] },
+    { id: "F-03", category: "untranslated",            label: "Untranslated slots",         count: 9,  severity: "medium", sample: "“Asset Type / Print / Stock” — English string copied verbatim into the German and Dutch slots.",   locales: ["de_DE","nl_NL"] },
+    { id: "F-04", category: "hallucination",           label: "Made-up terms",              count: 5,  severity: "high",   sample: "“How-To Doc” → “Wie-zu Doc” (DE) is not a real German construction.",                              locales: ["de_DE","fr_FR","es_ES","nl_NL"] },
+    { id: "F-05", category: "compound_error",          label: "Compound spacing",           count: 4,  severity: "low",    sample: "“Campaign Type” → “Campagne Type” (NL) should be one word: “Campagnetype.”",                       locales: ["nl_NL"] },
+    { id: "F-06", category: "word_order_error",        label: "Wrong word order",           count: 2,  severity: "low",    sample: "“Case Study” → “Caso de Estudio” (ES) — natural order is “Estudio de Caso.”",                       locales: ["es_ES","nl_NL"] },
+    { id: "F-07", category: "cross_option_collision",  label: "Two concepts, same word",    count: 2,  severity: "high",   sample: "“Branding” and “Logo” both translate to “Marca” (ES) — collision causes search ambiguity.",         locales: ["es_ES"] },
+    { id: "F-08", category: "missing",                 label: "Empty slots",                count: 3,  severity: "medium", sample: "Industry / Color / Music Track have empty slots in Dutch and Spanish.",                            locales: ["nl_NL","es_ES"] },
+    { id: "F-09", category: "taxonomic_error",         label: "Source data quality",        count: 1,  severity: "medium", sample: "“Dubai” is classified under Country — but Dubai is a city, not a country.",                        locales: ["all"] }
   ];
 
-  /* Real verdict format — pulled from MET-17 description */
   const SAMPLE_VERDICT_ROWS = [
-    { mp: "Channel",          option: "Campaign Type",       locale: "nl_NL", current: "Campagne Type",   proposed: "Campagnetype",    rationale: "Dutch orthography: two-element compounds are one word", blast: "Low" },
-    { mp: "Asset_Sub-Type",   option: "Brand Guidelines",    locale: "nl_NL", current: "Merk Richtlijnen",proposed: "Merkrichtlijnen", rationale: "Same Dutch compounding rule",                            blast: "Low" },
-    { mp: "Asset_Sub-Type",   option: "Interview Recording", locale: "nl_NL", current: "Interview Opname",proposed: "Interviewopname", rationale: "Same Dutch compounding rule",                            blast: "Low" },
-    { mp: "Channel_Sub-type", option: "System Integrator",   locale: "nl_NL", current: "Systeem Integrator", proposed: "Systeemintegrator", rationale: "Same Dutch compounding rule",                       blast: "Low" }
+    { mp: "Channel",          option: "Campaign Type",       locale: "nl_NL", current: "Campagne Type",       proposed: "Campagnetype",       rationale: "Dutch: two-element compounds are written as one word." },
+    { mp: "Asset Sub-Type",   option: "Brand Guidelines",    locale: "nl_NL", current: "Merk Richtlijnen",    proposed: "Merkrichtlijnen",    rationale: "Same Dutch compounding rule." },
+    { mp: "Asset Sub-Type",   option: "Interview Recording", locale: "nl_NL", current: "Interview Opname",    proposed: "Interviewopname",    rationale: "Same Dutch compounding rule." },
+    { mp: "Channel Sub-type", option: "System Integrator",   locale: "nl_NL", current: "Systeem Integrator",  proposed: "Systeemintegrator",  rationale: "Same Dutch compounding rule." }
+  ];
+
+  const VOCAB = [
+    { name: "Brand Terms",         entries: 0,   loaded: false, hint: "Names, taglines, products that should never be translated" },
+    { name: "Approved Renderings", entries: 0,   loaded: false, hint: "Preferred translation per source term, per locale" },
+    { name: "Industry Terms",      entries: 12,  loaded: true,  hint: "Pre-loaded common DAM and marketing vocabulary" },
+    { name: "Locale Conventions",  entries: 47,  loaded: true,  hint: "Compound rules, gender, formality, ordering per language" }
   ];
 
   const TIERS = [
     {
       id: "cold_start",
-      name: "Cold Start — Health Check",
-      headline: "Free taxonomy scan, no glossary, summary findings only",
+      name: "Cold Start",
+      headline: "Free taxonomy health check",
+      blurb: "Find out what's broken. Counts and categories, no specific corrections, no commitment.",
       price: "Free",
-      gates: ["Anonymised findings counts", "No specific corrections", "No citations"],
-      unlocks: ["Findings categorised by failure type", "Coverage report per locale", "Detection of source-data quality issues"],
-      next_step: "Upload your brand glossary to unlock Tier 2 — specific, citation-backed corrections",
+      unlocks: ["Failure-mode breakdown", "Coverage gap report per locale", "Detection of source-data quality issues"],
+      gates: ["Specific corrections", "Verified citations", "Apply-to-Bynder workflow"],
+      next_step: "Upload your brand vocabulary to unlock specific corrections.",
       current: true
     },
     {
-      id: "with_glossary",
-      name: "Standard — Cleanup Engagement",
-      headline: "Brand glossary as authority, full citations, board approvals",
-      price: "From $30K (one-time)",
+      id: "standard",
+      name: "Standard",
+      headline: "Cleanup engagement with citations",
+      blurb: "Brand vocabulary as the authority. Every proposed fix carries a citation. Apply-to-Bynder workflow opens, gated by board approval.",
+      price: "From $30K",
+      unlocks: ["Full proposal text per finding", "Vocabulary-backed citations", "Board approval workflow", "Apply-to-Bynder writeback"],
       gates: [],
-      unlocks: ["Full proposal text per finding", "Glossary-backed citations", "Board approval workflow", "Apply-to-Bynder write-back (gated)", "Coverage SLA target"],
-      next_step: "Add continuous monitoring to lock in ongoing alignment",
-      requires: "Brand glossary / termbase uploaded"
+      next_step: "Add continuous monitoring to lock in alignment.",
+      requires: "Brand vocabulary loaded"
     },
     {
-      id: "continuous",
-      name: "Sentry — Continuous Monitoring",
-      headline: "Drift detection 24/7, alerts on manual edits, baseline tracking",
-      price: "From $20K/year (subscription)",
+      id: "monitor",
+      name: "Sentry",
+      headline: "Continuous monitoring",
+      blurb: "Daily drift sweeps. Manual edits caught. Trend reporting. Alerts on divergence.",
+      price: "From $20K / year",
+      unlocks: ["Daily drift detection", "Manual-edit alerts", "Trend reporting", "Monthly executive briefing"],
       gates: [],
-      unlocks: ["Daily drift sweeps", "Manual-edit detection", "Trend reporting", "Slack/email alerts on divergence", "Monthly executive briefing"],
-      next_step: "Add Discovery AI integration if your tenant uses it",
-      requires: "Tier 2 completed at least once"
+      next_step: "Add Discovery AI augmentation if your tenant uses it.",
+      requires: "Standard tier completed once"
     },
     {
-      id: "discovery_ai",
+      id: "discovery",
       name: "Discovery AI Augmentation",
-      headline: "Audit Bynder's auto-tag suggestions per locale",
-      price: "+$15K/year add-on",
+      headline: "Audit auto-tag suggestions",
+      blurb: "Score Bynder's locale-specific auto-tag quality against your brand vocabulary.",
+      price: "+$15K / year",
+      unlocks: ["Per-locale auto-tag quality scoring", "Brand-vocabulary alignment", "Per-asset confidence trace"],
       gates: [],
-      unlocks: ["Locale-aware auto-tag quality scoring", "Suggestion alignment with brand glossary", "Per-asset confidence trace"],
-      next_step: "Bridge to Straker TMS for human-linguist routing",
-      requires: "Bynder Discovery AI active"
+      next_step: "Add expert review routing for highest-quality output.",
+      requires: "Discovery AI active on your tenant"
     },
     {
-      id: "tms_integrated",
-      name: "Straker TMS Integrated",
-      headline: "Findings route to human linguists with TM hits and termbase",
-      price: "Custom — premium tier",
+      id: "expert",
+      name: "Expert Review",
+      headline: "Verified human translation in the loop",
+      blurb: "Findings are routed to a verified linguist network with your brand vocabulary in hand. Every change carries human sign-off.",
+      price: "Custom",
+      unlocks: ["Verified human linguist review", "SLA-backed turnaround", "Provenance on every label"],
       gates: [],
-      unlocks: ["TM-leveraged proposals", "Human linguist sign-off per change", "SLA-backed turnaround", "Provenance on every label"],
-      next_step: "Multi-brand platform mode for LSP operators",
-      requires: "Straker TMS connection"
+      next_step: "Platform mode for organisations managing many brands.",
+      requires: "Expert review opted in"
     },
     {
       id: "platform",
-      name: "Platform — Multi-brand LSP",
-      headline: "Many customer brands, one operator dashboard, isolated workspaces",
+      name: "Platform",
+      headline: "Multi-brand, one dashboard",
+      blurb: "For agencies, holding companies, or large enterprises managing many client brands. Isolated workspaces, account-manager rollup view.",
       price: "Volume licence",
+      unlocks: ["Per-brand isolated workspace", "Account-manager rollup", "White-label option"],
       gates: [],
-      unlocks: ["Per-brand isolated workspace", "Account-manager rollup view", "White-label option"],
       next_step: "—",
-      requires: "LSP operator, more than 5 client brands"
+      requires: "Five or more brands under one operator"
     }
   ];
 
   /* ================================================================
-     ROUTER & APP STATE
+     STATE
      ================================================================ */
-  let view = "pipeline"; // welcome | probing | tier | pipeline | findings | approvals | tiers | agents
+  let view = "dashboard";
+  let mode = (typeof localStorage !== 'undefined' && localStorage.getItem('sentry-mode')) || 'arbitr';
+
+  const BRAND = {
+    arbitr: {
+      mark: 'a',
+      name: 'arbitr',
+      module: 'Taxonomy Sentry',
+      tenant: 'Solis Tea',
+      footer: 'arbitr — Trust &amp; Intelligence Platform · Taxonomy Sentry module',
+      modeLabel: 'arbitr standalone'
+    },
+    bynder: {
+      mark: 'B',
+      name: 'Bynder',
+      module: 'Taxonomy',
+      tenant: 'Solis Tea',
+      footer: 'Bynder · Taxonomy — multilingual alignment',
+      modeLabel: 'Bynder embedded'
+    }
+  };
 
   const TABS = [
-    { id: "pipeline",  label: "Pipeline",   icon: "layout-dashboard" },
-    { id: "findings",  label: "Findings",   icon: "search" },
-    { id: "approvals", label: "Approvals",  icon: "shield-check" },
-    { id: "agents",    label: "Specialists",icon: "users" },
-    { id: "tiers",     label: "Engagement", icon: "trending-up" }
+    { id: "dashboard",  label: "Dashboard",         icon: "layout-dashboard" },
+    { id: "vocabulary", label: "Brand Vocabulary",  icon: "book-open" },
+    { id: "findings",   label: "Findings",          icon: "search" },
+    { id: "governance", label: "Governance",        icon: "shield-check" },
+    { id: "engagement", label: "Engagement",        icon: "trending-up" }
   ];
 
+  function applyMode() {
+    document.documentElement.setAttribute('data-mode', mode);
+    if (typeof localStorage !== 'undefined') localStorage.setItem('sentry-mode', mode);
+    const b = BRAND[mode];
+    document.getElementById('brand-block').innerHTML = `
+      <span class="brand-mark">${b.mark}</span>
+      <span class="text-base">${b.name}</span>
+      <span class="brand-divider">·</span>
+      <span class="text-base" style="font-weight:500;color:var(--text-2);">${b.module}</span>
+      <span class="brand-divider">·</span>
+      <span class="brand-tenant">${b.tenant}</span>
+    `;
+    document.getElementById('footer-brand').innerHTML = b.footer;
+    document.getElementById('mode-label').textContent = b.modeLabel;
+  }
+  function setupModeToggle() {
+    document.getElementById('mode-toggle').onclick = () => {
+      mode = (mode === 'arbitr') ? 'bynder' : 'arbitr';
+      applyMode(); lucide.createIcons();
+    };
+  }
   function renderTopnav() {
-    const el = document.getElementById("topnav");
-    el.innerHTML = TABS.map(t => `
+    document.getElementById('topnav').innerHTML = TABS.map(t => `
       <a class="tab ${view === t.id ? 'active' : ''}" data-view="${t.id}">
         <i data-lucide="${t.icon}" class="w-4 h-4"></i>
         ${t.label}
       </a>
-    `).join("");
-    el.querySelectorAll(".tab").forEach(a => a.addEventListener("click", () => { view = a.dataset.view; render(); }));
+    `).join('');
+    document.querySelectorAll('.tab').forEach(a => a.addEventListener('click', () => { view = a.dataset.view; render(); }));
+  }
+  function sevPill(s) {
+    const cls = s === 'high' ? 'sev-high' : (s === 'medium' ? 'sev-medium' : 'sev-low');
+    return `<span class="sev-pill ${cls}">${s}</span>`;
   }
 
   /* ================================================================
      VIEWS
      ================================================================ */
-  function pillForSeverity(s) {
-    if (s === "high") return '<span class="pill pill-rose">high</span>';
-    if (s === "medium") return '<span class="pill pill-amber">medium</span>';
-    return '<span class="pill pill-gray">low</span>';
-  }
-
-  function renderPipeline() {
-    const total_findings = FINDINGS.reduce((a, b) => a + b.count, 0);
+  function renderDashboard() {
+    const total = FINDINGS.reduce((a,b) => a + b.count, 0);
     return `
       <div class="fade-in">
-        <!-- Tenant ribbon -->
-        <div class="text-sm text-gray-400 mb-6">
-          <span class="text-gray-300 font-medium">${TENANT.name}</span> is configured for
-          <span class="text-gray-200">${TENANT.locales.slice(1).map(l => l.toUpperCase().split('_')[0]).join(', ')}</span> ·
-          <span class="text-gray-200">Brand DAM</span> · <span class="text-gray-200">Marketing register</span>
+        <div style="margin-bottom: 28px;">
+          <div style="color: var(--text-2); font-size: 14px;">
+            <strong style="color: var(--text); font-weight: 600;">${TENANT.name}</strong>
+            <span style="color: var(--text-muted);"> is configured for </span>
+            <strong style="color: var(--text); font-weight: 500;">DE, FR, NL, ES</strong>
+            <span style="color: var(--text-muted);"> · </span>
+            <span style="color: var(--text-2);">Brand DAM</span>
+            <span style="color: var(--text-muted);"> · </span>
+            <span style="color: var(--text-2);">Marketing register</span>
+          </div>
         </div>
 
         <!-- 3-stage pipeline -->
-        <div class="flex items-stretch gap-4 mb-8">
+        <div style="display: flex; gap: 12px; margin-bottom: 28px;">
           <div class="stage-card">
-            <div class="flex items-center gap-2 mb-2">
-              <i data-lucide="file-input" class="w-4 h-4 text-blue-400"></i>
-              <div class="text-sm font-medium">Content Intake</div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div class="icon-tile blue" style="width: 32px; height: 32px;"><i data-lucide="file-input" class="w-4 h-4"></i></div>
+              <div class="stage-title">Content Intake</div>
             </div>
-            <div class="text-xs text-gray-400 mb-3">Live taxonomy snapshot from Bynder</div>
-            <div class="text-2xl font-semibold">${TENANT.tuple_count}</div>
-            <div class="text-xs text-gray-500">tuples (option × locale)</div>
-            <div class="text-xs text-gray-500 mt-2">${TENANT.metaproperty_count} metaproperties · ${TENANT.option_count} options · ${TENANT.locales.length} locales</div>
+            <div style="margin-top: 14px; font-size: 26px; font-weight: 600; color: var(--text);">${TENANT.tuple_count}</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">translation slots in your taxonomy</div>
+            <div class="stage-meta">${TENANT.metaproperty_count} categories · ${TENANT.option_count} options · ${TENANT.locales.length} locales</div>
           </div>
-          <div class="arrow self-center">→</div>
+          <div class="arrow-sep">→</div>
           <div class="stage-card">
-            <div class="flex items-center gap-2 mb-2">
-              <i data-lucide="scan-search" class="w-4 h-4 text-fuchsia-400"></i>
-              <div class="text-sm font-medium">Intelligence Extraction</div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div class="icon-tile purple" style="width: 32px; height: 32px;"><i data-lucide="scan-search" class="w-4 h-4"></i></div>
+              <div class="stage-title">Quality Audit</div>
             </div>
-            <div class="text-xs text-gray-400 mb-3">Auditor verdicts with citations</div>
-            <div class="text-2xl font-semibold">${total_findings}</div>
-            <div class="text-xs text-gray-500">failures across 9 categories</div>
-            <div class="text-xs text-gray-500 mt-2">${FINDINGS.filter(f=>f.severity==='high').reduce((a,b)=>a+b.count,0)} high · ${FINDINGS.filter(f=>f.severity==='medium').reduce((a,b)=>a+b.count,0)} medium · ${FINDINGS.filter(f=>f.severity==='low').reduce((a,b)=>a+b.count,0)} low</div>
+            <div style="margin-top: 14px; font-size: 26px; font-weight: 600; color: var(--text);">${total}</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">issues found across ${FINDINGS.length} categories</div>
+            <div class="stage-meta">${FINDINGS.filter(f=>f.severity==='high').reduce((a,b)=>a+b.count,0)} high · ${FINDINGS.filter(f=>f.severity==='medium').reduce((a,b)=>a+b.count,0)} medium · ${FINDINGS.filter(f=>f.severity==='low').reduce((a,b)=>a+b.count,0)} low</div>
           </div>
-          <div class="arrow self-center">→</div>
+          <div class="arrow-sep">→</div>
           <div class="stage-card">
-            <div class="flex items-center gap-2 mb-2">
-              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
-              <div class="text-sm font-medium">Trusted Output</div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div class="icon-tile green" style="width: 32px; height: 32px;"><i data-lucide="shield-check" class="w-4 h-4"></i></div>
+              <div class="stage-title">Approval Queue</div>
             </div>
-            <div class="text-xs text-gray-400 mb-3">Board approval queue · zero auto-writes</div>
-            <div class="text-2xl font-semibold">${FINDINGS.length}</div>
-            <div class="text-xs text-gray-500">change-set proposals awaiting board</div>
-            <div class="text-xs text-gray-500 mt-2">0 writes applied to Bynder yet — HITL enforced</div>
+            <div style="margin-top: 14px; font-size: 26px; font-weight: 600; color: var(--text);">${FINDINGS.length}</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">change sets awaiting your review</div>
+            <div class="stage-meta">0 changes applied · Human approval required</div>
           </div>
         </div>
 
-        <!-- Tier-status banner -->
-        <div class="card p-5 mb-6">
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <div class="text-xs text-gray-500 uppercase tracking-wide mb-1">Your current tier</div>
-              <div class="text-lg font-semibold mb-1">Cold Start — Health Check <span class="pill pill-blue ml-2">Free</span></div>
-              <div class="text-sm text-gray-400">Based on your tenant: no glossary detected, no audit baseline, Discovery AI active. You're seeing anonymised counts and category breakdowns. Specific corrections and citations are gated until you upload a brand glossary.</div>
+        <!-- Hero CTA -->
+        <div class="hero" style="margin-bottom: 18px;">
+          <div style="display: flex; align-items: center; gap: 18px; justify-content: space-between;">
+            <div style="display: flex; gap: 16px; align-items: center; flex: 1;">
+              <div class="icon-tile blue" style="width: 48px; height: 48px;"><i data-lucide="sparkles" class="w-5 h-5"></i></div>
+              <div>
+                <div class="card-title" style="font-size: 15px;">See your taxonomy audit in action</div>
+                <div class="card-desc" style="margin-top: 4px;">We've already pulled your live Bynder taxonomy and run a complete audit. Open the findings to see what we caught — no setup, no upload.</div>
+              </div>
             </div>
-            <button class="primary self-start" onclick="view='tiers'; render();">See engagement tiers →</button>
+            <button class="cta-btn" onclick="view='findings'; render();">View findings <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
           </div>
         </div>
 
-        <!-- Two-column: findings preview + agent ensemble -->
-        <div class="grid grid-cols-3 gap-4">
-          <div class="col-span-2 card p-5">
-            <div class="flex items-center justify-between mb-4">
-              <div class="text-sm font-semibold text-gray-200">Findings by category</div>
-              <button class="ghost" onclick="view='findings'; render();">View all →</button>
+        <!-- Tier banner -->
+        <div class="card card-row" style="margin-bottom: 24px; cursor: pointer;" onclick="view='engagement'; render();">
+          <div class="icon-tile amber"><i data-lucide="zap" class="w-5 h-5"></i></div>
+          <div style="flex: 1;">
+            <div class="subhead">Your current tier</div>
+            <div class="card-title" style="font-size: 15px;">Cold Start — Free health check</div>
+            <div class="card-desc" style="margin-top: 4px;">You're seeing issue counts and categories. Specific corrections, citations, and apply-to-Bynder unlock when you load your brand vocabulary.</div>
+          </div>
+          <div class="chev-right"><i data-lucide="chevron-right" class="w-5 h-5"></i></div>
+        </div>
+
+        <!-- Two-column secondary cards -->
+        <div class="grid-2" style="margin-bottom: 16px;">
+          <div class="card card-hover card-row">
+            <div class="icon-tile gray"><i data-lucide="upload" class="w-5 h-5"></i></div>
+            <div style="flex: 1;">
+              <div class="card-title">Upload your brand vocabulary</div>
+              <div class="card-desc">Brand terms, approved translations, do-not-translate list. Sharpens every finding and unlocks specific corrections.</div>
             </div>
-            <div class="space-y-3">
-              ${FINDINGS.map(f => `
-                <div class="flex items-center justify-between text-sm">
-                  <div class="flex items-center gap-3">
-                    ${pillForSeverity(f.severity)}
-                    <div class="text-gray-200">${f.label}</div>
+            <div class="chev-right"><i data-lucide="chevron-right" class="w-5 h-5"></i></div>
+          </div>
+          <div class="card card-hover card-row" onclick="view='governance'; render();">
+            <div class="icon-tile purple"><i data-lucide="git-branch" class="w-5 h-5"></i></div>
+            <div style="flex: 1;">
+              <div class="card-title">How review works</div>
+              <div class="card-desc">Seven steps from snapshot to verified proposal. Full transparency at every stage. <span style="color: var(--accent);">Explore the pipeline →</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-hover card-row" style="margin-bottom: 16px;">
+          <div class="icon-tile blue"><i data-lucide="layers" class="w-5 h-5"></i></div>
+          <div style="flex: 1;">
+            <div class="card-title">Continuous monitoring</div>
+            <div class="card-desc">Daily sweeps catch new options, manual edits, and divergence from your brand vocabulary — before they reach end users.</div>
+          </div>
+          <div class="chev-right"><i data-lucide="chevron-right" class="w-5 h-5"></i></div>
+        </div>
+
+        <div class="card card-hover card-row">
+          <div class="icon-tile green"><i data-lucide="package" class="w-5 h-5"></i></div>
+          <div style="flex: 1;">
+            <div class="card-title">Batch quality audit</div>
+            <div class="card-desc">Multi-locale analysis, cross-category consistency checks, and a coverage heatmap across your full taxonomy.</div>
+          </div>
+          <div class="chev-right"><i data-lucide="chevron-right" class="w-5 h-5"></i></div>
+        </div>
+
+        <!-- Vocabulary preview -->
+        <div style="margin-top: 36px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <i data-lucide="book-open" class="w-5 h-5" style="color: var(--accent);"></i>
+              <div class="card-title" style="font-size: 16px;">Your Brand Vocabulary</div>
+              <span class="status-pill" style="background: var(--warn-soft); color: #B45309;"><span class="dot" style="background: var(--warn);"></span>59 entries pre-loaded</span>
+            </div>
+            <button class="ghost-btn" onclick="view='vocabulary'; render();">Open vocabulary →</button>
+          </div>
+          <div class="card" style="padding: 22px;">
+            <div style="color: var(--text-muted); font-size: 13px; margin-bottom: 18px;">
+              Industry vocabulary and locale conventions are pre-loaded. Brand-specific terms and approved renderings unlock when you upload your own. Every audit you run adds more.
+            </div>
+            <div class="grid-2">
+              ${VOCAB.map(v => `
+                <div style="display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--bg-card-tint); border-radius: 9px;">
+                  <div class="icon-tile ${v.loaded ? 'green' : 'gray'}" style="width: 36px; height: 36px;"><i data-lucide="${v.loaded ? 'check' : 'circle-dashed'}" class="w-4 h-4"></i></div>
+                  <div style="flex: 1;">
+                    <div class="card-title" style="font-size: 13.5px;">${v.name}</div>
+                    <div class="card-desc" style="font-size: 12px;">${v.hint}</div>
                   </div>
-                  <div class="flex items-center gap-3">
-                    <div class="text-gray-400 text-xs">${f.locales.join(', ')}</div>
-                    <div class="text-gray-200 font-medium w-8 text-right">${f.count}</div>
-                  </div>
+                  <div style="font-size: 16px; font-weight: 600; color: ${v.loaded ? 'var(--text)' : 'var(--text-dim)'};">${v.entries}</div>
                 </div>
               `).join('')}
-            </div>
-          </div>
-
-          <div class="card p-5">
-            <div class="flex items-center justify-between mb-4">
-              <div class="text-sm font-semibold text-gray-200">Specialist agents</div>
-              <button class="ghost" onclick="view='agents'; render();">All →</button>
-            </div>
-            <div class="space-y-2">
-              ${AGENTS.slice(0, 4).map(a => `
-                <div class="flex items-start gap-3">
-                  <div class="agent-icon"><i data-lucide="bot" class="w-4 h-4 text-blue-400"></i></div>
-                  <div class="flex-1 min-w-0">
-                    <div class="text-sm font-medium">${a.name}</div>
-                    <div class="text-xs text-gray-400 truncate">${a.role}</div>
-                  </div>
-                </div>
-              `).join('')}
-              <div class="text-xs text-gray-500 pt-2 border-t border-gray-800">7 specialist agents · ${AGENTS.filter(a=>a.model.includes('Sonnet')).length} Sonnet, ${AGENTS.filter(a=>a.model.includes('Haiku')).length} Haiku</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Trust + Org Brain row -->
-        <div class="grid grid-cols-2 gap-4 mt-6">
-          <div class="card p-5">
-            <div class="text-sm font-semibold text-gray-200 mb-3">Your Org Brain</div>
-            <div class="text-xs text-gray-400 mb-4">Knowledge bases that compound with every audit. Empty until you upload your brand glossary.</div>
-            <div class="grid grid-cols-3 gap-3 text-center">
-              <div class="card-2 p-3"><div class="text-lg font-semibold text-gray-500">0</div><div class="text-xs text-gray-500">Glossary terms</div></div>
-              <div class="card-2 p-3"><div class="text-lg font-semibold text-gray-500">0</div><div class="text-xs text-gray-500">TM segments</div></div>
-              <div class="card-2 p-3"><div class="text-lg font-semibold text-gray-500">0</div><div class="text-xs text-gray-500">Do-not-translate</div></div>
-            </div>
-            <button class="secondary w-full mt-4">Upload brand glossary →</button>
-          </div>
-
-          <div class="card p-5">
-            <div class="text-sm font-semibold text-gray-200 mb-3">How an audit run works</div>
-            <div class="text-xs text-gray-400 mb-4">Seven steps from snapshot to verified proposal. Full transparency, citation-backed at every stage.</div>
-            <div class="space-y-2 text-xs">
-              <div class="flex items-center gap-2"><div class="step-dot done"></div><div>Inventory snapshot — pull live taxonomy from Bynder</div></div>
-              <div class="flex items-center gap-2"><div class="step-dot done"></div><div>Drift baseline — compare against last snapshot</div></div>
-              <div class="flex items-center gap-2"><div class="step-dot done"></div><div>Hierarchy validation — parent/child consistency</div></div>
-              <div class="flex items-center gap-2"><div class="step-dot done"></div><div>Linguistic audit — verdicts per (option, locale)</div></div>
-              <div class="flex items-center gap-2"><div class="step-dot done"></div><div>Reconciliation — bundle findings into change sets</div></div>
-              <div class="flex items-center gap-2"><div class="step-dot done"></div><div>Board approval — every write gated by human review</div></div>
-              <div class="flex items-center gap-2"><div class="step-dot"></div><div class="text-gray-500">Apply to Bynder — only after board approval (gated in Cold Start)</div></div>
             </div>
           </div>
         </div>
@@ -389,233 +634,298 @@
   }
 
   function renderFindings() {
+    const total = FINDINGS.reduce((a,b)=>a+b.count,0);
     return `
       <div class="fade-in">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <div class="text-xl font-semibold">Findings — Audit Run v0</div>
-            <div class="text-sm text-gray-400">Live snapshot · ${TENANT.tuple_count} tuples audited · ${FINDINGS.reduce((a,b)=>a+b.count,0)} failures across ${FINDINGS.length} categories</div>
-          </div>
-          <button class="secondary"><i data-lucide="download" class="w-4 h-4 inline"></i> Export findings</button>
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 20px; font-weight: 600; color: var(--text);">Findings</div>
+          <div style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">${TENANT.tuple_count} translation slots audited · ${total} issues found across ${FINDINGS.length} categories</div>
         </div>
 
-        <div class="card overflow-hidden">
-          <table class="w-full text-sm">
-            <thead class="text-xs text-gray-400 bg-black/20">
-              <tr>
-                <th class="text-left px-4 py-3">Category</th>
-                <th class="text-left px-4 py-3">Severity</th>
-                <th class="text-left px-4 py-3">Count</th>
-                <th class="text-left px-4 py-3">Locales affected</th>
-                <th class="text-left px-4 py-3">Sample finding</th>
-                <th class="text-left px-4 py-3">Ticket</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${FINDINGS.map(f => `
-                <tr class="border-t border-gray-800 approval-row">
-                  <td class="px-4 py-3 font-medium">${f.label}</td>
-                  <td class="px-4 py-3">${pillForSeverity(f.severity)}</td>
-                  <td class="px-4 py-3 text-gray-300">${f.count}</td>
-                  <td class="px-4 py-3 text-xs text-gray-400">${f.locales.join(', ')}</td>
-                  <td class="px-4 py-3 text-xs text-gray-300">${f.sample}</td>
-                  <td class="px-4 py-3 text-xs text-gray-500 font-mono">${f.id}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          ${FINDINGS.map(f => `
+            <div class="card" style="padding: 20px 22px;">
+              <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 18px;">
+                <div style="flex: 1;">
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    ${sevPill(f.severity)}
+                    <div class="card-title">${f.label}</div>
+                    <span class="scope-tag">${f.count} ${f.count === 1 ? 'instance' : 'instances'}</span>
+                  </div>
+                  <div class="card-desc" style="margin-bottom: 10px;">${f.sample}</div>
+                  <div style="font-size: 11.5px; color: var(--text-muted);">
+                    Affected locales: ${f.locales.map(l => `<span class="mono" style="color: var(--text-2);">${l}</span>`).join(' · ')}
+                  </div>
+                </div>
+                <div style="text-align: right; flex-shrink: 0;">
+                  <div style="color: var(--text-dim); font-size: 11px;">FINDING ID</div>
+                  <div class="mono" style="color: var(--text-2);">${f.id}</div>
+                </div>
+              </div>
+            </div>
+          `).join('')}
         </div>
 
-        <div class="card p-5 mt-6">
-          <div class="text-sm font-semibold text-gray-200 mb-2">Why these specific categories?</div>
-          <div class="text-xs text-gray-400 leading-relaxed">
-            The Linguistic Auditor checks every (option, locale) tuple against general translation knowledge plus cross-option consistency. In Cold Start mode, you see categorised counts. With a brand glossary loaded, each finding becomes a full proposal with the proposed correction, rationale, and a blast-radius estimate — citation-backed against your termbase. Upgrade to Standard to unlock the per-finding detail.
+        <div class="hero" style="margin-top: 28px;">
+          <div style="display: flex; align-items: center; gap: 18px; justify-content: space-between;">
+            <div style="display: flex; gap: 16px; align-items: center; flex: 1;">
+              <div class="icon-tile blue" style="width: 44px; height: 44px;"><i data-lucide="book-open" class="w-5 h-5"></i></div>
+              <div>
+                <div class="card-title">See the specific corrections</div>
+                <div class="card-desc" style="margin-top: 4px;">Each issue above has a proposed fix with full rationale and a citation. Upload your brand vocabulary to unlock per-finding detail and the approval workflow.</div>
+              </div>
+            </div>
+            <button class="cta-btn">Upload vocabulary <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
           </div>
         </div>
       </div>
     `;
   }
 
-  function renderApprovals() {
+  function renderGovernance() {
     return `
       <div class="fade-in">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <div class="text-xl font-semibold">Board Approval Queue</div>
-            <div class="text-sm text-gray-400">${FINDINGS.length} change-set proposals awaiting your sign-off · zero writes applied to Bynder</div>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="pill pill-amber">HITL Enforced</span>
-          </div>
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 20px; font-weight: 600; color: var(--text);">Governance &amp; Approvals</div>
+          <div style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">${FINDINGS.length} change sets pending review · 0 changes applied · human approval required on every write</div>
         </div>
 
-        <!-- Locked overlay for cold-start: we show one real verdict, gate the rest -->
-        <div class="card overflow-hidden mb-6">
-          <div class="px-5 py-4 border-b border-gray-800 flex items-center justify-between">
+        <!-- Featured approval -->
+        <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 24px;">
+          <div style="padding: 20px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
             <div>
-              <div class="text-sm font-semibold">MET-17 · Board approval: fix compound_error in nl_NL — 4 options</div>
-              <div class="text-xs text-gray-400 mt-1">Filed by Reconciliation Lead · severity Low · blast radius Low</div>
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                ${sevPill("low")}
+                <div class="card-title" style="font-size: 15px;">Compound spacing fixes in Dutch — 4 options</div>
+              </div>
+              <div class="card-desc">Filed by review pipeline · all four apply the same Dutch compounding rule.</div>
             </div>
-            <div class="flex items-center gap-2">
-              <button class="secondary">Reject</button>
-              <button class="primary">Approve all 4</button>
+            <div style="display: flex; gap: 8px;">
+              <button class="secondary-btn">Reject</button>
+              <button class="cta-btn">Approve all 4</button>
             </div>
           </div>
-          <table class="w-full text-sm">
-            <thead class="text-xs text-gray-400 bg-black/20">
+          <table class="data-table">
+            <thead>
               <tr>
-                <th class="text-left px-4 py-2.5">Metaproperty</th>
-                <th class="text-left px-4 py-2.5">Option</th>
-                <th class="text-left px-4 py-2.5">Locale</th>
-                <th class="text-left px-4 py-2.5">Current</th>
-                <th class="text-left px-4 py-2.5">Proposed</th>
-                <th class="text-left px-4 py-2.5">Rationale</th>
+                <th>Category</th>
+                <th>Option</th>
+                <th>Locale</th>
+                <th>Current</th>
+                <th>Proposed</th>
+                <th>Rationale</th>
               </tr>
             </thead>
             <tbody>
               ${SAMPLE_VERDICT_ROWS.map(r => `
-                <tr class="border-t border-gray-800 approval-row">
-                  <td class="px-4 py-3 text-xs text-gray-300">${r.mp}</td>
-                  <td class="px-4 py-3 text-xs text-gray-300">${r.option}</td>
-                  <td class="px-4 py-3"><span class="pill pill-blue">${r.locale}</span></td>
-                  <td class="px-4 py-3 text-xs text-gray-400 font-mono">${r.current}</td>
-                  <td class="px-4 py-3 text-xs text-emerald-300 font-mono">${r.proposed}</td>
-                  <td class="px-4 py-3 text-xs text-gray-400">${r.rationale}</td>
+                <tr>
+                  <td>${r.mp}</td>
+                  <td>${r.option}</td>
+                  <td><span class="mono" style="color: var(--accent);">${r.locale}</span></td>
+                  <td class="mono">${r.current}</td>
+                  <td class="mono" style="color: #047857; font-weight: 500;">${r.proposed}</td>
+                  <td style="color: var(--text-muted); font-size: 12px;">${r.rationale}</td>
                 </tr>
               `).join('')}
             </tbody>
           </table>
         </div>
 
-        <!-- Gated tickets -->
-        <div class="text-xs text-gray-500 uppercase tracking-wide mb-2">${FINDINGS.length - 1} more change sets — gated in Cold Start</div>
-        <div class="space-y-2 tier-locked">
-          ${FINDINGS.filter(f => f.id !== "MET-17").map(f => `
-            <div class="card-2 px-4 py-3 flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <i data-lucide="lock" class="w-3.5 h-3.5 text-gray-500"></i>
-                <div>
-                  <div class="text-sm">${f.id} · ${f.label}</div>
-                  <div class="text-xs text-gray-500">${f.count} ${f.count === 1 ? 'instance' : 'instances'} · ${f.locales.join(', ')}</div>
-                </div>
+        <div class="subhead">Pending review — locked at your current tier</div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          ${FINDINGS.filter(f => f.category !== 'compound_error').map(f => `
+            <div class="card card-row locked" style="padding: 14px 22px;">
+              <div class="icon-tile gray" style="width: 32px; height: 32px;"><i data-lucide="lock" class="w-3.5 h-3.5"></i></div>
+              <div style="flex: 1;">
+                <div class="card-title" style="font-size: 13px;">${f.label} — ${f.count} ${f.count === 1 ? 'instance' : 'instances'}</div>
+                <div class="card-desc" style="font-size: 12px;">Affected: ${f.locales.join(', ')}</div>
               </div>
-              <span class="pill pill-gray">requires glossary</span>
+              <span class="lock-overlay"><i data-lucide="key" class="w-3 h-3"></i> requires brand vocabulary</span>
             </div>
           `).join('')}
         </div>
 
-        <div class="mt-6 p-5 card glow">
-          <div class="text-sm font-semibold mb-2">Unlock all change sets</div>
-          <div class="text-sm text-gray-400 mb-4">Upload your brand glossary to give the Auditor an authority source. Every proposal becomes citation-backed, the apply-to-Bynder gate opens, and your dedicated cleanup engagement begins.</div>
-          <button class="primary">Upload brand glossary →</button>
-        </div>
-      </div>
-    `;
-  }
-
-  function renderAgents() {
-    return `
-      <div class="fade-in">
-        <div class="text-xl font-semibold mb-1">Your specialist agent ensemble</div>
-        <div class="text-sm text-gray-400 mb-6">Matched to Solis Tea's workspace · running on Paperclip orchestration · governance and budget enforced per agent</div>
-
-        <div class="grid grid-cols-2 gap-3">
-          ${AGENTS.map(a => `
-            <div class="agent-card">
-              <div class="agent-icon"><i data-lucide="bot" class="w-5 h-5 text-blue-400"></i></div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between">
-                  <div class="font-semibold text-gray-200">${a.name}</div>
-                  <span class="pill ${a.model.includes('Sonnet') ? 'pill-blue' : 'pill-gray'}">${a.model.split(' ').slice(-2).join(' ')}</span>
-                </div>
-                <div class="text-xs text-blue-300 mb-1">${a.role}</div>
-                <div class="text-xs text-gray-400">${a.trait}</div>
+        <div class="hero" style="margin-top: 28px;">
+          <div style="display: flex; align-items: center; gap: 18px; justify-content: space-between;">
+            <div style="display: flex; gap: 16px; align-items: center; flex: 1;">
+              <div class="icon-tile amber" style="width: 44px; height: 44px;"><i data-lucide="key" class="w-5 h-5"></i></div>
+              <div>
+                <div class="card-title">Unlock all change sets</div>
+                <div class="card-desc" style="margin-top: 4px;">Upload your brand vocabulary so every fix carries a citation. Apply-to-Bynder workflow opens — still gated by your approval on every change.</div>
               </div>
             </div>
-          `).join('')}
+            <button class="cta-btn">Upload vocabulary <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+          </div>
         </div>
 
-        <div class="card p-5 mt-6">
-          <div class="text-sm font-semibold mb-2">How the ensemble works</div>
-          <div class="text-xs text-gray-400 leading-relaxed">
-            Lexa (CEO) routes the mission. Ops Director coordinates day-to-day. Inventory snapshots the Bynder state. Auditor produces verdicts. Hierarchy checks structural integrity. Reconciliation bundles findings. Monitor watches for drift between runs. Every action is traced, every cost is tracked, every change requires board approval. This is the moat — not the model, the governance.
+        <!-- Audit pipeline -->
+        <div style="margin-top: 36px;">
+          <div style="font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px;">How review works</div>
+          <div style="color: var(--text-muted); font-size: 13px; margin-bottom: 18px;">Seven steps from snapshot to verified proposal. Full transparency, citation-backed.</div>
+          <div class="card" style="padding: 22px;">
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              ${[
+                { label: "Inventory snapshot — live taxonomy pulled from Bynder", done: true },
+                { label: "Drift baseline — compared against last snapshot", done: true },
+                { label: "Structural validation — hierarchy and parent/child consistency", done: true },
+                { label: "Quality audit — every translation slot evaluated", done: true },
+                { label: "Reconciliation — findings bundled into change sets", done: true },
+                { label: "Human approval — every write requires your sign-off", done: true },
+                { label: "Apply to Bynder — only after approval (gated at Cold Start)", done: false }
+              ].map((s, i) => `
+                <div style="display: flex; align-items: center; gap: 12px; font-size: 13px;">
+                  <span class="step-dot ${s.done ? 'done' : 'next'}"></span>
+                  <span style="color: ${s.done ? 'var(--text-2)' : 'var(--text-muted)'};">${i + 1}. ${s.label}</span>
+                </div>
+              `).join('')}
+            </div>
           </div>
         </div>
       </div>
     `;
   }
 
-  function renderTiers() {
+  function renderVocabulary() {
     return `
       <div class="fade-in">
-        <div class="text-xl font-semibold mb-1">Engagement Tiers</div>
-        <div class="text-sm text-gray-400 mb-6">Your tier is determined by what we detect in your tenant. Unlock the next tier by closing the gap on the right.</div>
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 20px; font-weight: 600; color: var(--text);">Brand Vocabulary</div>
+          <div style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">The authority every audit decision references. Industry and locale baselines are pre-loaded. Brand-specific terms unlock when you upload your own.</div>
+        </div>
 
-        <div class="space-y-3">
-          ${TIERS.map((t, i) => `
-            <div class="card p-5 ${t.current ? 'you-are-here' : ''} ${i > 0 && !t.current ? 'tier-locked' : ''}">
-              <div class="flex items-start justify-between gap-6">
-                <div class="flex-1">
-                  <div class="flex items-center gap-2 mb-1">
-                    <div class="text-base font-semibold">${t.name}</div>
-                    ${t.current ? '<span class="pill pill-blue">you are here</span>' : ''}
+        <!-- Visualization placeholder -->
+        <div class="card" style="padding: 36px; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; min-height: 280px; position: relative;">
+          <svg viewBox="0 0 600 280" style="width: 100%; max-width: 600px;">
+            <!-- Connection lines -->
+            <line x1="300" y1="90"  x2="180" y2="190" stroke="#E5E5E0" stroke-width="1.5" />
+            <line x1="300" y1="90"  x2="420" y2="190" stroke="#E5E5E0" stroke-width="1.5" />
+            <line x1="180" y1="190" x2="80"  y2="240" stroke="#E5E5E0" stroke-width="1.5" stroke-dasharray="3 4" />
+            <line x1="180" y1="190" x2="280" y2="240" stroke="#E5E5E0" stroke-width="1.5" stroke-dasharray="3 4" />
+            <line x1="420" y1="190" x2="320" y2="240" stroke="#E5E5E0" stroke-width="1.5" stroke-dasharray="3 4" />
+            <line x1="420" y1="190" x2="520" y2="240" stroke="#E5E5E0" stroke-width="1.5" stroke-dasharray="3 4" />
+            <!-- Central node -->
+            <circle cx="300" cy="90" r="40" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" />
+            <text x="300" y="86" text-anchor="middle" font-family="Inter" font-size="13" font-weight="600" fill="#2563EB">Industry</text>
+            <text x="300" y="100" text-anchor="middle" font-family="Inter" font-size="10" fill="#2563EB">12 entries</text>
+            <!-- Secondary nodes -->
+            <circle cx="180" cy="190" r="36" fill="#D1FADF" stroke="#10B981" stroke-width="2" />
+            <text x="180" y="186" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600" fill="#047857">Locale</text>
+            <text x="180" y="200" text-anchor="middle" font-family="Inter" font-size="10" fill="#047857">47 entries</text>
+            <circle cx="420" cy="190" r="36" fill="#F7F8FA" stroke="#B5B5B0" stroke-width="2" stroke-dasharray="4 4" />
+            <text x="420" y="186" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600" fill="#8A8A87">Brand</text>
+            <text x="420" y="200" text-anchor="middle" font-family="Inter" font-size="10" fill="#8A8A87">0 entries</text>
+            <!-- Tertiary nodes (dashed/empty) -->
+            <circle cx="80"  cy="240" r="22" fill="#F7F8FA" stroke="#B5B5B0" stroke-width="1.5" stroke-dasharray="3 3" />
+            <text x="80"  y="244" text-anchor="middle" font-family="Inter" font-size="10" fill="#8A8A87">Compounds</text>
+            <circle cx="280" cy="240" r="22" fill="#F7F8FA" stroke="#B5B5B0" stroke-width="1.5" stroke-dasharray="3 3" />
+            <text x="280" y="244" text-anchor="middle" font-family="Inter" font-size="10" fill="#8A8A87">Gender</text>
+            <circle cx="320" cy="240" r="22" fill="#F7F8FA" stroke="#B5B5B0" stroke-width="1.5" stroke-dasharray="3 3" />
+            <text x="320" y="244" text-anchor="middle" font-family="Inter" font-size="10" fill="#8A8A87">DNT</text>
+            <circle cx="520" cy="240" r="22" fill="#F7F8FA" stroke="#B5B5B0" stroke-width="1.5" stroke-dasharray="3 3" />
+            <text x="520" y="244" text-anchor="middle" font-family="Inter" font-size="10" fill="#8A8A87">Renderings</text>
+          </svg>
+        </div>
+
+        <div class="subhead">Vocabulary layers</div>
+        <div class="grid-2" style="margin-bottom: 24px;">
+          ${VOCAB.map(v => `
+            <div class="card card-row card-hover">
+              <div class="icon-tile ${v.loaded ? 'green' : 'gray'}"><i data-lucide="${v.loaded ? 'check-circle-2' : 'circle-dashed'}" class="w-5 h-5"></i></div>
+              <div style="flex: 1;">
+                <div class="card-title">${v.name}</div>
+                <div class="card-desc">${v.hint}</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 20px; font-weight: 600; color: ${v.loaded ? 'var(--text)' : 'var(--text-dim)'};">${v.entries}</div>
+                <div style="font-size: 11px; color: var(--text-muted);">entries</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="hero">
+          <div style="display: flex; align-items: center; gap: 18px; justify-content: space-between;">
+            <div style="display: flex; gap: 16px; align-items: center; flex: 1;">
+              <div class="icon-tile blue" style="width: 44px; height: 44px;"><i data-lucide="upload" class="w-5 h-5"></i></div>
+              <div>
+                <div class="card-title">Upload your brand vocabulary</div>
+                <div class="card-desc" style="margin-top: 4px;">CSV, TBX, or paste in. We accept brand terms, approved renderings per locale, and do-not-translate lists. Once loaded, every audit decision references your authority.</div>
+              </div>
+            </div>
+            <button class="cta-btn">Upload <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderEngagement() {
+    return `
+      <div class="fade-in">
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 20px; font-weight: 600; color: var(--text);">Engagement</div>
+          <div style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Your tier is determined by what we detect in your tenant. Unlock the next tier by closing the gap noted on each card.</div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          ${TIERS.map(t => `
+            <div class="card ${t.current ? 'you-are-here' : ''}" style="padding: 22px 24px;">
+              <div style="display: flex; gap: 22px; align-items: flex-start;">
+                <div style="flex: 1;">
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                    <div class="card-title" style="font-size: 16px;">${t.name}</div>
+                    ${t.current ? '<span class="scope-tag">you are here</span>' : ''}
                   </div>
-                  <div class="text-sm text-gray-400 mb-3">${t.headline}</div>
-                  ${t.requires ? `<div class="text-xs text-gray-500 mb-2"><i data-lucide="key" class="w-3 h-3 inline"></i> Requires: ${t.requires}</div>` : ''}
-                  <div class="grid grid-cols-2 gap-4 mt-3">
+                  <div style="color: var(--text-2); font-size: 13.5px; margin-bottom: 8px;">${t.headline}</div>
+                  <div class="card-desc" style="margin-bottom: 12px;">${t.blurb}</div>
+                  ${t.requires ? `<div style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 12px;"><i data-lucide="key" class="w-3 h-3 inline" style="vertical-align: -2px;"></i> Requires: ${t.requires}</div>` : ''}
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                     <div>
-                      <div class="text-xs uppercase tracking-wide text-gray-500 mb-1">What unlocks</div>
-                      <ul class="text-xs text-gray-300 space-y-1">
-                        ${t.unlocks.map(u => `<li class="flex items-start gap-1.5"><i data-lucide="check" class="w-3 h-3 text-emerald-400 mt-0.5 flex-shrink-0"></i> ${u}</li>`).join('')}
-                      </ul>
+                      <div class="subhead" style="margin-bottom: 6px;">What unlocks</div>
+                      ${t.unlocks.map(u => `<div style="font-size: 12.5px; color: var(--text-2); margin-bottom: 4px; display: flex; gap: 6px; align-items: flex-start;"><i data-lucide="check" class="w-3 h-3" style="color: var(--success); margin-top: 2px; flex-shrink: 0;"></i> ${u}</div>`).join('')}
                     </div>
                     <div>
                       ${t.gates.length ? `
-                        <div class="text-xs uppercase tracking-wide text-gray-500 mb-1">What's gated</div>
-                        <ul class="text-xs text-gray-400 space-y-1">
-                          ${t.gates.map(g => `<li class="flex items-start gap-1.5"><i data-lucide="lock" class="w-3 h-3 text-gray-500 mt-0.5 flex-shrink-0"></i> ${g}</li>`).join('')}
-                        </ul>
+                        <div class="subhead" style="margin-bottom: 6px;">Gated until next tier</div>
+                        ${t.gates.map(g => `<div style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 4px; display: flex; gap: 6px; align-items: flex-start;"><i data-lucide="lock" class="w-3 h-3" style="color: var(--text-dim); margin-top: 2px; flex-shrink: 0;"></i> ${g}</div>`).join('')}
                       ` : `
-                        <div class="text-xs uppercase tracking-wide text-gray-500 mb-1">Upsell path</div>
-                        <div class="text-xs text-gray-400">${t.next_step}</div>
+                        <div class="subhead" style="margin-bottom: 6px;">Next step</div>
+                        <div style="font-size: 12.5px; color: var(--text-muted);">${t.next_step}</div>
                       `}
                     </div>
                   </div>
                 </div>
-                <div class="text-right flex-shrink-0">
-                  <div class="text-xs text-gray-500 uppercase tracking-wide mb-1">Pricing</div>
-                  <div class="text-sm font-semibold text-gray-200">${t.price}</div>
-                  ${!t.current ? `<button class="secondary mt-3 text-xs">Request upgrade</button>` : ''}
+                <div style="text-align: right; min-width: 140px;">
+                  <div class="subhead">Pricing</div>
+                  <div style="font-size: 16px; font-weight: 600; color: var(--text); margin-top: 4px;">${t.price}</div>
+                  ${!t.current ? `<button class="secondary-btn" style="margin-top: 12px;">Request upgrade</button>` : ''}
                 </div>
               </div>
             </div>
           `).join('')}
         </div>
 
-        <div class="card p-5 mt-6">
-          <div class="text-sm font-semibold mb-2">Same engine, different gates</div>
-          <div class="text-xs text-gray-400 leading-relaxed">
-            Every tier runs against the same Taxonomy Sentry engine. Cold Start sees categorised counts; Standard sees per-finding proposals with glossary citations; Sentry adds continuous drift detection; TMS-Integrated routes through human linguists. Upgrading isn't about more software — it's about expanding what the agents are allowed to show you, propose, and act on. Human-in-the-loop stays throughout. It's the moat.
-          </div>
+        <div class="card" style="padding: 22px; margin-top: 28px; background: var(--bg-card-tint);">
+          <div class="card-title" style="font-size: 14px; margin-bottom: 6px;">Same engine, different gates</div>
+          <div class="card-desc">Every tier runs against the same review engine. Upgrading isn't about more software — it's about expanding what the system is allowed to show you, propose, and act on. Human approval stays throughout. That's the moat.</div>
         </div>
       </div>
     `;
   }
 
-  /* ================================================================
-     MAIN RENDER
-     ================================================================ */
   function render() {
     renderTopnav();
-    const root = document.getElementById("root");
-    if (view === "pipeline")       root.innerHTML = renderPipeline();
-    else if (view === "findings")  root.innerHTML = renderFindings();
-    else if (view === "approvals") root.innerHTML = renderApprovals();
-    else if (view === "agents")    root.innerHTML = renderAgents();
-    else if (view === "tiers")     root.innerHTML = renderTiers();
+    const root = document.getElementById('root');
+    if (view === 'dashboard')   root.innerHTML = renderDashboard();
+    else if (view === 'findings')   root.innerHTML = renderFindings();
+    else if (view === 'governance') root.innerHTML = renderGovernance();
+    else if (view === 'vocabulary') root.innerHTML = renderVocabulary();
+    else if (view === 'engagement') root.innerHTML = renderEngagement();
     lucide.createIcons();
   }
 
+  applyMode();
+  setupModeToggle();
   render();
   </script>
 </body>
