@@ -269,6 +269,105 @@
       border-radius: 6px;
       letter-spacing: 0.02em;
     }
+
+    /* ============ VISUAL AUDIT ============ */
+    .va-card { padding: 0; overflow: hidden; }
+    .va-card-body { display: flex; align-items: stretch; }
+    .va-thumb {
+      width: 280px;
+      flex-shrink: 0;
+      background: var(--bg-card-tint);
+      border-right: 1px solid var(--border-soft);
+      overflow: hidden;
+      position: relative;
+    }
+    .va-thumb img {
+      width: 100%; height: 100%;
+      display: block;
+      object-fit: cover;
+      min-height: 240px;
+    }
+    .va-thumb-meta {
+      position: absolute; bottom: 8px; left: 8px;
+      background: rgba(15, 20, 25, 0.78);
+      color: #FAF9F6;
+      font-family: 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 10.5px;
+      padding: 3px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+    }
+    .va-body { flex: 1; padding: 18px 22px; min-width: 0; }
+    .va-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 11.5px;
+      padding: 3px 8px;
+      background: var(--bg-card-tint);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--text-2);
+      margin: 0 6px 6px 0;
+    }
+    .va-tag .k { color: var(--text-muted); }
+    .va-tag .v { color: var(--text); font-weight: 500; }
+    .va-tag.changed { background: var(--warn-soft); border-color: #F59E0B; }
+    .va-tag.changed .v { color: #B45309; text-decoration: line-through; }
+    .va-tag.proposed { background: var(--success-soft); border-color: var(--success); }
+    .va-tag.proposed .v { color: #047857; font-weight: 600; }
+    .va-verdict {
+      margin-top: 12px;
+      padding: 14px 16px;
+      background: var(--bg-hero);
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+    }
+    .va-verdict-label {
+      font-family: 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .va-verdict-text {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.55;
+      font-style: italic;
+    }
+    .va-confidence-bar {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-left: auto;
+      font-family: 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 10.5px;
+      color: var(--text-muted);
+      font-style: normal;
+      letter-spacing: 0.04em;
+    }
+    .va-confidence-bar .track {
+      width: 56px; height: 4px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .va-confidence-bar .fill { height: 100%; background: var(--accent); }
+    .flag-pill {
+      display: inline-flex; align-items: center;
+      padding: 3px 9px;
+      font-family: 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      border-radius: 4px;
+    }
+    .flag-CRITICAL    { background: var(--danger-soft);  color: var(--danger); }
+    .flag-PENDING     { background: var(--warn-soft);    color: #B45309; }
+    .flag-RESOLVED    { background: var(--success-soft); color: #047857; }
+    .flag-RECOMMENDED { background: var(--accent-soft);  color: var(--accent); }
   </style>
 </head>
 <body>
@@ -386,6 +485,79 @@
       { code: "es_ES", name: "Spanish", findable: 14796, dark: 4616, pct: 76.2 }
     ]
   };
+
+  /* Visual Audit — vision verification layer. A multimodal AI specialist reads
+     pixel content and compares it to the asset's manual tags. Every disagreement
+     is escalated; nothing is auto-applied. Mirrors the existing Findings card
+     pattern so reviewers see asset impact next to every flag. */
+  const VISUAL_AUDIT = [
+    {
+      id: "VA-01",
+      file: "tsaa_laya_lemon_ginger_lifestyle.jpg",
+      image: "https://images.unsplash.com/photo-1527398317618-b3da8a79e0ca?fm=jpg&q=60&w=1200&auto=format&fit=crop",
+      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Beverages", "Tea_Type": "Herbal" },
+      vision: { summary: "Lifestyle composition with branded packaging in frame. OCR captures 'Tsaa Laya · Lemon Ginger' from container label.", confidence: 92 },
+      suggested_tags: null,
+      flag: "RESOLVED", severity: "low",
+      rationale: "Vision verification agreed with all three manual tags. OCR adds two free entries (brand · product line) to the Org Brain after reviewer approval.",
+      assets: 18, active_90d: 12, top_collection: "Solis Tea — Herbal Range", collection_count: 3, parity_gap: 0
+    },
+    {
+      id: "VA-02",
+      file: "solis_blacktea_loose_leaf.jpg",
+      image: "https://images.unsplash.com/photo-1433891248364-3ce993ff0e92?fm=jpg&q=60&w=1200&auto=format&fit=crop",
+      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Beverages", "Tea_Type": "Black Tea" },
+      vision: { summary: "High-magnification view of dried, oxidized tea leaves consistent with black tea characteristics.", confidence: 96 },
+      suggested_tags: null,
+      flag: "RESOLVED", severity: "low",
+      rationale: "Vision verification agreed with Tea_Type and Asset_Sub-Type. Confidence above threshold.",
+      assets: 41, active_90d: 38, top_collection: "Solis Tea — Black Tea Range", collection_count: 4, parity_gap: 0
+    },
+    {
+      id: "VA-03",
+      file: "solis_green_tea_cup_book.jpg",
+      image: "https://images.unsplash.com/photo-1701520839071-55bdfe64c5ed?fm=jpg&q=60&w=1200&auto=format&fit=crop",
+      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Beverages", "Tea_Type": "Black Tea" },
+      vision: { summary: "Brewed beverage in cup with pale yellow-green hue; companion bowl shows whole leaves; lifestyle setting with book.", confidence: 88 },
+      suggested_tags: { "Asset_Sub-Type": "Lifestyle", "Tea_Type": "Green Tea" },
+      flag: "CRITICAL", severity: "high",
+      rationale: "Two tag conflicts: Tea_Type (manual: Black Tea, vision: Green Tea) and Asset_Sub-Type (manual: Product, vision: Lifestyle). Both routed to reviewer; no write applied.",
+      assets: 87, active_90d: 64, top_collection: "Solis Tea — Lifestyle Library", collection_count: 9, parity_gap: 41
+    },
+    {
+      id: "VA-04",
+      file: "earl_grey_cafe_pour.jpg",
+      image: "https://images.unsplash.com/photo-1629152818378-f47a3f2a916f?fm=jpg&q=60&w=1200&auto=format&fit=crop",
+      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Beverages", "Channel": "Retail" },
+      vision: { summary: "In-use scene: hand pouring earl grey from ceramic teapot into mug. No packaging visible. Café setting.", confidence: 94 },
+      suggested_tags: { "Asset_Sub-Type": "Lifestyle", "Channel": "Editorial" },
+      flag: "PENDING", severity: "medium",
+      rationale: "Manual Asset_Sub-Type is Product but no packaging or product hero is visible. Vision proposes Lifestyle / Editorial; reviewer to confirm intended use.",
+      assets: 142, active_90d: 118, top_collection: "Lifestyle — Café Series", collection_count: 6, parity_gap: 36
+    },
+    {
+      id: "VA-05",
+      file: "red_teapot_still_life.jpg",
+      image: "https://images.unsplash.com/photo-1639428133787-b580d8c27f96?fm=jpg&q=60&w=1200&auto=format&fit=crop",
+      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Beverages", "Beverage": "Tea" },
+      vision: { summary: "Single vessel composition. No beverage, leaves, or packaging visible to verify beverage content claim.", confidence: 61 },
+      suggested_tags: null,
+      flag: "PENDING", severity: "medium",
+      rationale: "Confidence below the 75 threshold. Content is consistent with the Beverage:Tea tag but not verifiable from pixels alone. Sent to human review rather than re-tagged.",
+      assets: 23, active_90d: 14, top_collection: "Product Stills — Ceramics", collection_count: 2, parity_gap: 0
+    },
+    {
+      id: "VA-06",
+      file: "matcha_glass_modern.jpg",
+      image: "https://images.unsplash.com/photo-1717398804885-a6c22b3e5c2f?fm=jpg&q=60&w=1200&auto=format&fit=crop",
+      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Beverages", "Tea_Type": "Matcha", "Country": "US" },
+      vision: { summary: "Whisked green matcha preparation in glass with wooden coaster. Composition consistent with Japanese-origin preparation conventions.", confidence: 90 },
+      suggested_tags: { "Country": "JP" },
+      flag: "RECOMMENDED", severity: "low",
+      rationale: "Country tag (US) conflicts with the cultural register of the preparation. Vision recommends JP. Reviewer to decide: intended market vs. content provenance.",
+      assets: 31, active_90d: 22, top_collection: "Matcha Range — Editorial", collection_count: 3, parity_gap: 28
+    }
+  ];
 
   /* Concrete brand vocabulary entries — what would populate after a customer
      completes the 3-step onboarding wizard. Sourced from the eval brand_vocab.json. */
@@ -511,6 +683,7 @@
     { id: "dashboard",  label: "Dashboard",         icon: "layout-dashboard" },
     { id: "vocabulary", label: "Brand Vocabulary",  icon: "book-open" },
     { id: "findings",   label: "Findings",          icon: "search" },
+    { id: "visual",     label: "Visual Audit",      icon: "scan-eye" },
     { id: "governance", label: "Governance",        icon: "shield-check" },
     { id: "engagement", label: "Engagement",        icon: "trending-up" }
   ];
@@ -662,6 +835,23 @@
               </div>
             </div>
             <button class="cta-btn" onclick="view='findings'; render();">View findings <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+          </div>
+        </div>
+
+        <!-- Visual Audit promo (new layer) -->
+        <div class="hero" style="margin-bottom: 18px; background: linear-gradient(135deg, var(--bg-hero) 0%, var(--accent-soft) 100%); border-color: var(--accent);">
+          <div style="display: flex; align-items: center; gap: 18px; justify-content: space-between;">
+            <div style="display: flex; gap: 16px; align-items: center; flex: 1;">
+              <div class="icon-tile blue" style="width: 48px; height: 48px;"><i data-lucide="scan-eye" class="w-5 h-5"></i></div>
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div class="card-title" style="font-size: 15px;">Visual Audit — vision verification on every asset</div>
+                  <span class="flag-pill flag-RECOMMENDED">NEW LAYER</span>
+                </div>
+                <div class="card-desc" style="margin-top: 4px;">${VISUAL_AUDIT.length} sample assets reviewed by a multimodal AI specialist. ${VISUAL_AUDIT.filter(a=>a.flag!=='RESOLVED').length} mistags caught, ${VISUAL_AUDIT.filter(a=>a.flag==='RESOLVED').length} clean. Vision reads the pixels; reviewers approve the writes.</div>
+              </div>
+            </div>
+            <button class="cta-btn" onclick="view='visual'; render();">Open Visual Audit <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
           </div>
         </div>
 
@@ -827,6 +1017,146 @@
               </div>
             </div>
             <button class="cta-btn">Upload vocabulary <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function vaTagsRow(tags, opts) {
+    opts = opts || {};
+    return Object.entries(tags).map(([k, v]) => {
+      const cls = opts.changedKeys && opts.changedKeys.indexOf(k) > -1 ? ' changed' : '';
+      return `<span class="va-tag${cls}"><span class="k">${k}:</span><span class="v">${v}</span></span>`;
+    }).join('');
+  }
+  function vaProposedRow(suggested) {
+    if (!suggested) return '';
+    return Object.entries(suggested).map(([k, v]) =>
+      `<span class="va-tag proposed"><span class="k">${k}:</span><span class="v">${v}</span></span>`
+    ).join('');
+  }
+  function vaConfidence(n) {
+    return `<span class="va-confidence-bar">
+      <span class="track"><span class="fill" style="width: ${n}%;"></span></span>
+      <span>${n} / 100</span>
+    </span>`;
+  }
+
+  function renderVisualAudit() {
+    const total = VISUAL_AUDIT.length;
+    const critical = VISUAL_AUDIT.filter(a => a.flag === 'CRITICAL').length;
+    const pending = VISUAL_AUDIT.filter(a => a.flag === 'PENDING').length;
+    const recommended = VISUAL_AUDIT.filter(a => a.flag === 'RECOMMENDED').length;
+    const resolved = VISUAL_AUDIT.filter(a => a.flag === 'RESOLVED').length;
+    const totalAssets = VISUAL_AUDIT.reduce((a, b) => a + (b.assets || 0), 0);
+    const totalActive = VISUAL_AUDIT.reduce((a, b) => a + (b.active_90d || 0), 0);
+
+    return `
+      <div class="fade-in">
+        <div style="margin-bottom: 18px;">
+          <div style="font-size: 20px; font-weight: 600; color: var(--text);">Visual Audit</div>
+          <div style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Multimodal verification of asset content against the tags it carries. ${total} sample assets reviewed · ${critical + pending + recommended} flagged for reviewer · ${resolved} resolved · ${totalAssets.toLocaleString()} similar assets in scope across the library (${totalActive.toLocaleString()} active in last 90 days).</div>
+        </div>
+
+        <!-- Summary strip -->
+        <div class="card" style="padding: 16px 22px; margin-bottom: 18px; background: var(--bg-card-tint); display: flex; align-items: center; gap: 18px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 8px; color: var(--text-2); font-size: 12.5px; flex: 1; min-width: 320px;">
+            <i data-lucide="scan-eye" class="w-4 h-4" style="color: var(--accent);"></i>
+            A multimodal AI specialist reads pixel content and compares it to the asset's manual tags. Every disagreement is escalated to reviewer approval. Nothing is auto-applied.
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <span class="flag-pill flag-CRITICAL">CRITICAL · ${critical}</span>
+            <span class="flag-pill flag-PENDING">PENDING · ${pending}</span>
+            <span class="flag-pill flag-RECOMMENDED">RECOMMENDED · ${recommended}</span>
+            <span class="flag-pill flag-RESOLVED">RESOLVED · ${resolved}</span>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          ${[...VISUAL_AUDIT].sort((a,b) => {
+            const order = { CRITICAL: 0, PENDING: 1, RECOMMENDED: 2, RESOLVED: 3 };
+            return order[a.flag] - order[b.flag];
+          }).map(a => {
+            const changedKeys = a.suggested_tags ? Object.keys(a.suggested_tags) : [];
+            return `
+              <div class="card va-card">
+                <div class="va-card-body">
+                  <div class="va-thumb">
+                    <img src="${a.image}" alt="${a.file}" loading="lazy" />
+                    <span class="va-thumb-meta">${a.file}</span>
+                  </div>
+                  <div class="va-body">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+                      <span class="flag-pill flag-${a.flag}">${a.flag}</span>
+                      ${sevPill(a.severity)}
+                      <span class="mono" style="font-size: 10.5px; color: var(--text-dim); margin-left: auto;">${a.id}</span>
+                    </div>
+
+                    <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 6px;">Current tags</div>
+                    <div style="margin-bottom: 4px;">${vaTagsRow(a.current_tags, { changedKeys })}</div>
+
+                    <div class="va-verdict">
+                      <div class="va-verdict-label">
+                        <i data-lucide="eye" class="w-3 h-3"></i>
+                        Vision verification
+                        ${vaConfidence(a.vision.confidence)}
+                      </div>
+                      <div class="va-verdict-text">"${a.vision.summary}"</div>
+                    </div>
+
+                    ${a.suggested_tags ? `
+                      <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-top: 14px; margin-bottom: 6px;">Suggested re-tag</div>
+                      <div style="margin-bottom: 4px;">${vaProposedRow(a.suggested_tags)}</div>
+                    ` : ''}
+
+                    <div style="margin-top: 12px; font-size: 12.5px; color: var(--text-2); line-height: 1.55;">
+                      <strong style="color: var(--text); font-weight: 600;">Flagged because:</strong> ${a.rationale}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Asset-impact panel -->
+                <div style="padding: 14px 22px; background: var(--bg-card-tint); border-top: 1px solid var(--border-soft); display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+                  <div>
+                    <div style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; margin-bottom: 2px;">Similar assets</div>
+                    <div style="font-size: 17px; font-weight: 600; color: var(--text);">${(a.assets||0).toLocaleString()}</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">${(a.active_90d||0).toLocaleString()} active in 90d</div>
+                  </div>
+                  <div style="width: 1px; height: 32px; background: var(--border);"></div>
+                  <div>
+                    <div style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; margin-bottom: 2px;">Findability gap</div>
+                    <div style="font-size: 17px; font-weight: 600; color: ${a.parity_gap >= 35 ? 'var(--warn)' : 'var(--text)'};">${a.parity_gap}%</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">${a.parity_gap === 0 ? 'no measurable impact' : 'of similar assets dark'}</div>
+                  </div>
+                  <div style="width: 1px; height: 32px; background: var(--border);"></div>
+                  <div>
+                    <div style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; margin-bottom: 2px;">Top collection</div>
+                    <div style="font-size: 12.5px; font-weight: 500; color: var(--text);">${a.top_collection}</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">${a.collection_count} ${a.collection_count === 1 ? 'collection' : 'collections'} touched</div>
+                  </div>
+                  <div style="margin-left: auto; display: flex; gap: 8px;">
+                    <button class="secondary-btn" style="font-size: 12px;">Inspect</button>
+                    ${a.flag === 'RESOLVED'
+                      ? `<button class="secondary-btn" style="font-size: 12px;"><i data-lucide="check" class="w-3 h-3"></i> Add to Org Brain</button>`
+                      : `<button class="cta-btn" style="font-size: 12px; padding: 6px 12px;" title="Locked at your current tier"><i data-lucide="lock" class="w-3 h-3"></i> Approve re-tag</button>`}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="hero" style="margin-top: 28px;">
+          <div style="display: flex; align-items: center; gap: 18px; justify-content: space-between;">
+            <div style="display: flex; gap: 16px; align-items: center; flex: 1;">
+              <div class="icon-tile blue" style="width: 44px; height: 44px;"><i data-lucide="scan-eye" class="w-5 h-5"></i></div>
+              <div>
+                <div class="card-title">Visual audit as a continuous layer</div>
+                <div class="card-desc" style="margin-top: 4px;">The same Vision Specialist that produced these verdicts runs on every new and edited asset in your tenant. Mistags and below-threshold flags arrive in the review queue with the asset thumbnail, the proposed re-tag, and the citation. Apply-to-${mode === 'bynder' ? 'Bynder' : 'DAM'} workflow opens at the Standard tier.</div>
+              </div>
+            </div>
+            <button class="cta-btn">Open engagement <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
           </div>
         </div>
       </div>
@@ -1155,6 +1485,7 @@
     const root = document.getElementById('root');
     if (view === 'dashboard')   root.innerHTML = renderDashboard();
     else if (view === 'findings')   root.innerHTML = renderFindings();
+    else if (view === 'visual')     root.innerHTML = renderVisualAudit();
     else if (view === 'governance') root.innerHTML = renderGovernance();
     else if (view === 'vocabulary') root.innerHTML = renderVocabulary();
     else if (view === 'engagement') root.innerHTML = renderEngagement();
