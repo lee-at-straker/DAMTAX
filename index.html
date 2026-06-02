@@ -738,7 +738,7 @@
       <span class="brand-divider">·</span>
       <span class="text-base" style="font-weight:500;color:var(--text-2);">${b.module}</span>
       <span class="brand-divider">·</span>
-      <span class="brand-switcher" id="brand-switcher" title="Switch brand (multi-tenant demo)">
+      <div class="brand-switcher" id="brand-switcher" title="Switch brand (multi-tenant demo)">
         <span>${tenantName}</span>
         <i data-lucide="chevron-down"></i>
         <div class="brand-dropdown" id="brand-dropdown">
@@ -748,7 +748,7 @@
               <span class="brand-meta">${p.meta}</span>
             </div>`).join('')}
         </div>
-      </span>
+      </div>
     `;
     document.getElementById('footer-brand').innerHTML = b.footer;
     document.getElementById('mode-label').textContent = b.modeLabel;
