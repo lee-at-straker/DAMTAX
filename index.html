@@ -451,31 +451,25 @@
   };
 
   const FINDINGS = [
-    { id: "F-01", category: "word_sense_error",        label: "Wrong meaning",              count: 14, severity: "high",   sample: "“Stock” → “Lager” (DE) means warehouse stock; in context it should mean stock photography.",          locales: ["de_DE","nl_NL","es_ES"],
-      assets: 1842, active_90d: 1267, top_collection: "DE — Retail Channel Toolkit", collection_count: 17, parity_gap: 86 },
-    { id: "F-02", category: "register_mismatch",       label: "Wrong tone",                 count: 12, severity: "medium", sample: "“Industry” → “Industrie” (FR) reads as manufacturing register; marketing register is “Secteur”.",   locales: ["fr_FR","nl_NL","es_ES"],
-      assets: 3104, active_90d: 2412, top_collection: "FR — Spring Campaign 2026", collection_count: 24, parity_gap: 100 },
-    { id: "F-03", category: "untranslated",            label: "Untranslated slots",         count: 9,  severity: "medium", sample: "“Asset Type / Print / Stock” — English string copied verbatim into the German and Dutch slots.",   locales: ["de_DE","nl_NL","fr_FR"],
-      assets: 967, active_90d: 612, top_collection: "NL — Wholesale Catalog", collection_count: 11, parity_gap: 78 },
-    { id: "F-04", category: "hallucination",           label: "Made-up terms",              count: 5,  severity: "high",   sample: "“How-To Doc” → “Wie-zu Doc” (DE) is not a real German construction.",                              locales: ["de_DE","fr_FR","es_ES","nl_NL"],
-      assets: 214, active_90d: 178, top_collection: "DE — How-To Library", collection_count: 6, parity_gap: 92 },
-    { id: "F-05", category: "compound_error",          label: "Compound spacing",           count: 4,  severity: "low",    sample: "“Campaign Type” → “Campagne Type” (NL) should be one word: “Campagnetype.”",                       locales: ["nl_NL"],
-      assets: 489, active_90d: 312, top_collection: "NL — Campaign Library", collection_count: 8, parity_gap: 64 },
-    { id: "F-06", category: "word_order_error",        label: "Wrong word order",           count: 2,  severity: "low",    sample: "“Case Study” → “Caso de Estudio” (ES) — natural order is “Estudio de Caso.”",                       locales: ["es_ES","nl_NL"],
-      assets: 142, active_90d: 98, top_collection: "ES — B2B Case Studies", collection_count: 4, parity_gap: 71 },
-    { id: "F-07", category: "cross_option_collision",  label: "Two concepts, same word",    count: 2,  severity: "high",   sample: "“Branding” and “Logo” both translate to “Marca” (ES) — collision causes search ambiguity.",         locales: ["es_ES"],
-      assets: 387, active_90d: 301, top_collection: "ES — Brand System", collection_count: 5, parity_gap: 100 },
-    { id: "F-08", category: "missing",                 label: "Empty slots",                count: 3,  severity: "medium", sample: "Industry / Color / Music Track have empty slots in Dutch and Spanish.",                            locales: ["nl_NL","es_ES"],
-      assets: 0, active_90d: 0, top_collection: "—", collection_count: 0, parity_gap: 100 },
-    { id: "F-09", category: "taxonomic_error",         label: "Source data quality",        count: 1,  severity: "medium", sample: "“Dubai” is classified under Country — but Dubai is a city, not a country.",                        locales: ["all"],
-      assets: 76, active_90d: 41, top_collection: "ME — UAE Market", collection_count: 2, parity_gap: 0 }
+    { id: "F-01", category: "ai_tag_pollution", label: "AI tag pollution", count: 11, severity: "medium", sample: "“Person”, “Indoors”, and color tags applied next to structured taxonomy by Bynder Automated Tags (Amazon Rekognition). Clutters search, no canonical mapping.", locales: ["all"],
+      assets: 517, active_90d: 403, top_collection: "Auto — Showroom Stills", collection_count: 11, parity_gap: 42 },
+    { id: "F-02", category: "synonym_proliferation", label: "Synonym proliferation", count: 2, severity: "medium", sample: "Rekognition emitted Factory + Manufacturing on the same asset. Search results fragment across variants — only one maps to a structured option.", locales: ["all"],
+      assets: 94, active_90d: 73, top_collection: "Auto — Workshop B-Roll", collection_count: 6, parity_gap: 71 },
+    { id: "F-03", category: "structured_vs_ai", label: "AI vs. structured", count: 5, severity: "high", sample: "Structured Industry says Electronics & Technology; Rekognition “Plastic” at 95% confidence. Reviewer required — re-tag or reject.", locales: ["all"],
+      assets: 235, active_90d: 183, top_collection: "Electronics — Datasheet Hero", collection_count: 8, parity_gap: 88 },
+    { id: "F-04", category: "coverage_erosion", label: "Coverage erosion", count: 15, severity: "high", sample: "Structured Industry tag blank on 15 assets while Rekognition surfaces strong industry signals (Injection 94%, Laboratory 91%, Food 89%). Taxonomy layer drifts behind what AI sees.", locales: ["all"],
+      assets: 705, active_90d: 549, top_collection: "Pharma — Lab Bench", collection_count: 14, parity_gap: 100 },
+    { id: "F-05", category: "translation_rot", label: "Translation rot", count: 5, severity: "medium", sample: "5 new metaproperty options added in English by regional teams with no translations for de_DE, fr_FR, nl_NL, es_ES. Multilingual coverage breaks per option.", locales: ["all"],
+      assets: 235, active_90d: 183, top_collection: "Industry — Aerospace_Defense (en)", collection_count: 5, parity_gap: 96 },
+    { id: "F-06", category: "cross_team_naming", label: "Cross-team naming drift", count: 6, severity: "low", sample: "Same campaign tagged 3 ways across teams: Q4_2025_Campaign / Q4_Campaign_2025 / Holiday_Q4_2025. Search and filter behavior fragments — no canonical.", locales: ["all"],
+      assets: 282, active_90d: 219, top_collection: "Campaigns — Q4 / Holiday", collection_count: 9, parity_gap: 64 }
   ];
 
   const SAMPLE_VERDICT_ROWS = [
-    { mp: "Channel",          option: "Campaign Type",       locale: "nl_NL", current: "Campagne Type",       proposed: "Campagnetype",       rationale: "Dutch: two-element compounds are written as one word." },
-    { mp: "Asset Sub-Type",   option: "Brand Guidelines",    locale: "nl_NL", current: "Merk Richtlijnen",    proposed: "Merkrichtlijnen",    rationale: "Same Dutch compounding rule." },
-    { mp: "Asset Sub-Type",   option: "Interview Recording", locale: "nl_NL", current: "Interview Opname",    proposed: "Interviewopname",    rationale: "Same Dutch compounding rule." },
-    { mp: "Channel Sub-type", option: "System Integrator",   locale: "nl_NL", current: "Systeem Integrator",  proposed: "Systeemintegrator",  rationale: "Same Dutch compounding rule." }
+    { mp: "Industry",         option: "(blank)",            locale: "en_US", current: "(unset)",             proposed: "Plastic & Polymer",  rationale: "Coverage erosion. Asset has no Industry tag while Rekognition signals Injection 94% / Plastic 91%. Apply structured tag." },
+    { mp: "Industry",         option: "Aerospace_Defense",  locale: "de_DE", current: "(unset)",             proposed: "Luft- und Raumfahrt", rationale: "Translation rot. New option added in English with no translations. Add de_DE / fr_FR / nl_NL / es_ES." },
+    { mp: "Tags (free-form)", option: "Person, Adult",      locale: "en_US", current: "Person + Adult",      proposed: "(remove duplicate)",  rationale: "Synonym proliferation. Rekognition emitted two terms for the same concept; structured does not. Keep one canonical." },
+    { mp: "Industry",         option: "Electronics & Tech.",locale: "en_US", current: "Electronics & Tech.", proposed: "Plastic & Polymer",   rationale: "Structured-vs-AI contradiction. Structured says Electronics; Rekognition Plastic 95%. Reviewer to confirm." }
   ];
 
   const VOCAB = [
@@ -820,7 +814,7 @@
               <div class="stage-title">Content Intake</div>
             </div>
             <div style="margin-top: 14px; font-size: 26px; font-weight: 600; color: var(--text);">${TENANT.tuple_count}</div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">translation slots in your taxonomy</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">taxonomy slots monitored for drift</div>
             <div class="stage-meta">${TENANT.metaproperty_count} categories · ${TENANT.option_count} options · ${TENANT.locales.length} locales</div>
           </div>
           <div class="arrow-sep">→</div>
@@ -830,7 +824,7 @@
               <div class="stage-title">Quality Audit</div>
             </div>
             <div style="margin-top: 14px; font-size: 26px; font-weight: 600; color: var(--text);">${total}</div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">issues found across ${FINDINGS.length} categories</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">drift events across ${FINDINGS.length} dimensions</div>
             <div class="stage-meta">${FINDINGS.filter(f=>f.severity==='high').reduce((a,b)=>a+b.count,0)} high · ${FINDINGS.filter(f=>f.severity==='medium').reduce((a,b)=>a+b.count,0)} medium · ${FINDINGS.filter(f=>f.severity==='low').reduce((a,b)=>a+b.count,0)} low</div>
           </div>
           <div class="arrow-sep">→</div>
