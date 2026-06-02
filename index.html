@@ -71,6 +71,32 @@
     html[data-mode="bynder"] .brand-mark { background: var(--accent); }
     .brand-divider { color: var(--text-dim); font-weight: 400; margin: 0 2px; }
     .brand-tenant { color: var(--text-2); font-weight: 400; font-size: 14px; }
+    .brand-switcher {
+      position: relative; display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 999px;
+      background: var(--accent-soft); color: var(--accent);
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      transition: background 0.15s ease;
+      border: 1px solid transparent;
+    }
+    .brand-switcher:hover { background: #D8E7F5; border-color: var(--accent); }
+    .brand-switcher svg { width: 12px; height: 12px; }
+    .brand-dropdown {
+      position: absolute; top: calc(100% + 6px); left: 0; z-index: 50;
+      min-width: 260px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: 10px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.10);
+      padding: 6px; display: none;
+    }
+    .brand-dropdown.show { display: block; }
+    .brand-option {
+      padding: 9px 12px; border-radius: 6px; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; color: var(--text);
+    }
+    .brand-option:hover { background: var(--bg-card-tint); }
+    .brand-option.active { background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+    .brand-option .brand-meta { color: var(--text-muted); font-size: 11px; }
 
     /* ============ TAB NAV ============ */
     .nav-row {
@@ -412,10 +438,10 @@
 
   <script>
   /* ================================================================
-     EMBEDDED DATA — real values from the Solis Tea sandbox + audit
+     EMBEDDED DATA — real values from the Meridian Industrial Group sandbox + audit
      ================================================================ */
   const TENANT = {
-    name: "Solis Tea",
+    name: "Meridian Industrial Group",
     url: "straker-sandbox.bynder.com",
     locales: ["en_US", "de_DE", "fr_FR", "nl_NL", "es_ES"],
     metaproperty_count: 13,
@@ -458,7 +484,7 @@
     { name: "Locale Conventions",  entries: 47,  loaded: true,  hint: "Compound rules, gender, formality, ordering per language" }
   ];
 
-  /* Real measured accuracy from the blind eval against the Solis Tea golden dataset.
+  /* Real measured accuracy from the blind eval against the Meridian Industrial Group golden dataset.
      308 items, 4 target locales, classes balanced as described in the eval report. */
   const EVAL = {
     sample_size: 308,
@@ -493,77 +519,77 @@
   const VISUAL_AUDIT = [
     {
       id: "VA-01",
-      file: "tsaa_laya_lemon_ginger_lifestyle.jpg",
-      image: "https://images.unsplash.com/photo-1527398317618-b3da8a79e0ca?fm=jpg&q=60&w=1200&auto=format&fit=crop",
-      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Beverages", "Tea_Type": "Herbal" },
-      vision: { summary: "Lifestyle composition with branded packaging in frame. OCR captures 'Tsaa Laya · Lemon Ginger' from container label.", confidence: 92 },
+      file: "meridian_safety_inspection_lifestyle.jpg",
+      image: "https://images.unsplash.com/photo-1581094288338-2314dddb7ece?fm=jpg&q=60&w=1200&auto=format&fit=crop",
+      current_tags: { "Asset_Sub-Type": "Lifestyle", "Industry": "Automative_Subcontractors", "Material": "Composite" },
+      vision: { summary: "Lifestyle composition: technician with branded safety gear in frame. OCR captures 'Meridian · Safety-Grade Composite' from helmet label.", confidence: 92 },
       suggested_tags: null,
       flag: "RESOLVED", severity: "low",
-      rationale: "Vision verification agreed with all three manual tags. OCR adds two free entries (brand · product line) to the Org Brain after reviewer approval.",
-      assets: 18, active_90d: 12, top_collection: "Solis Tea — Herbal Range", collection_count: 3, parity_gap: 0
+      rationale: "Vision verification agreed with all three manual tags. OCR adds two free entries (brand · safety class) to the Org Brain after reviewer approval.",
+      assets: 18, active_90d: 12, top_collection: "Meridian Industrial — Pharma Range", collection_count: 3, parity_gap: 0
     },
     {
       id: "VA-02",
-      file: "solis_blacktea_loose_leaf.jpg",
-      image: "https://images.unsplash.com/photo-1433891248364-3ce993ff0e92?fm=jpg&q=60&w=1200&auto=format&fit=crop",
-      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Beverages", "Tea_Type": "Black Tea" },
-      vision: { summary: "High-magnification view of dried, oxidized tea leaves consistent with black tea characteristics.", confidence: 96 },
+      file: "meridian_cnc_titanium_macro.jpg",
+      image: "https://images.unsplash.com/photo-1565514020179-026b92b84bb6?fm=jpg&q=60&w=1200&auto=format&fit=crop",
+      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Metal_Machining", "Material": "Titanium" },
+      vision: { summary: "High-magnification view of CNC-machined titanium parts consistent with aerospace-grade tolerances.", confidence: 96 },
       suggested_tags: null,
       flag: "RESOLVED", severity: "low",
-      rationale: "Vision verification agreed with Tea_Type and Asset_Sub-Type. Confidence above threshold.",
-      assets: 41, active_90d: 38, top_collection: "Solis Tea — Black Tea Range", collection_count: 4, parity_gap: 0
+      rationale: "Vision verification agreed with Material and Asset_Sub-Type. Confidence above threshold.",
+      assets: 41, active_90d: 38, top_collection: "Meridian Industrial — Metal Machining Range", collection_count: 4, parity_gap: 0
     },
     {
       id: "VA-03",
-      file: "solis_green_tea_cup_book.jpg",
-      image: "https://images.unsplash.com/photo-1701520839071-55bdfe64c5ed?fm=jpg&q=60&w=1200&auto=format&fit=crop",
-      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Beverages", "Tea_Type": "Black Tea" },
-      vision: { summary: "Brewed beverage in cup with pale yellow-green hue; companion bowl shows whole leaves; lifestyle setting with book.", confidence: 88 },
-      suggested_tags: { "Asset_Sub-Type": "Lifestyle", "Tea_Type": "Green Tea" },
+      file: "meridian_logistics_dispatch_lifestyle.jpg",
+      image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?fm=jpg&q=60&w=1200&auto=format&fit=crop",
+      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Logistics", "Material": "Aluminum" },
+      vision: { summary: "Dispatch coordinator at workstation reviewing palletised aluminum components; lifestyle setting with logbook.", confidence: 88 },
+      suggested_tags: { "Asset_Sub-Type": "Lifestyle", "Material": "Steel" },
       flag: "CRITICAL", severity: "high",
-      rationale: "Two tag conflicts: Tea_Type (manual: Black Tea, vision: Green Tea) and Asset_Sub-Type (manual: Product, vision: Lifestyle). Both routed to reviewer; no write applied.",
-      assets: 87, active_90d: 64, top_collection: "Solis Tea — Lifestyle Library", collection_count: 9, parity_gap: 41
+      rationale: "Two tag conflicts: Material (manual: Aluminum, vision: Steel) and Asset_Sub-Type (manual: Product, vision: Lifestyle). Both routed to reviewer; no write applied.",
+      assets: 87, active_90d: 64, top_collection: "Meridian Industrial — Operations Library", collection_count: 9, parity_gap: 41
     },
     {
       id: "VA-04",
-      file: "earl_grey_cafe_pour.jpg",
-      image: "https://images.unsplash.com/photo-1629152818378-f47a3f2a916f?fm=jpg&q=60&w=1200&auto=format&fit=crop",
-      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Beverages", "Channel": "Retail" },
-      vision: { summary: "In-use scene: hand pouring earl grey from ceramic teapot into mug. No packaging visible. Café setting.", confidence: 94 },
+      file: "workshop_lathe_in_use.jpg",
+      image: "https://images.unsplash.com/photo-1518770660439-4636190af475?fm=jpg&q=60&w=1200&auto=format&fit=crop",
+      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Metal_Machining", "Channel": "Distributor" },
+      vision: { summary: "In-use scene: machinist operating manual lathe on a steel workpiece. No product packaging visible. Workshop setting.", confidence: 94 },
       suggested_tags: { "Asset_Sub-Type": "Lifestyle", "Channel": "Editorial" },
       flag: "PENDING", severity: "medium",
-      rationale: "Manual Asset_Sub-Type is Product but no packaging or product hero is visible. Vision proposes Lifestyle / Editorial; reviewer to confirm intended use.",
-      assets: 142, active_90d: 118, top_collection: "Lifestyle — Café Series", collection_count: 6, parity_gap: 36
+      rationale: "Manual Asset_Sub-Type is Product but no product hero is visible — this is an in-use workshop scene. Vision proposes Lifestyle / Editorial; reviewer to confirm intended use.",
+      assets: 142, active_90d: 118, top_collection: "Lifestyle — Workshop Series", collection_count: 6, parity_gap: 36
     },
     {
       id: "VA-05",
-      file: "red_teapot_still_life.jpg",
-      image: "https://images.unsplash.com/photo-1639428133787-b580d8c27f96?fm=jpg&q=60&w=1200&auto=format&fit=crop",
-      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Beverages", "Beverage": "Tea" },
-      vision: { summary: "Single vessel composition. No beverage, leaves, or packaging visible to verify beverage content claim.", confidence: 61 },
+      file: "precision_gauge_still_life.jpg",
+      image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?fm=jpg&q=60&w=1200&auto=format&fit=crop",
+      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Electronics_Technology", "Component": "Gauge" },
+      vision: { summary: "Single component composition. No serial number, datasheet, or packaging visible to verify precision-gauge content claim.", confidence: 61 },
       suggested_tags: null,
       flag: "PENDING", severity: "medium",
-      rationale: "Confidence below the 75 threshold. Content is consistent with the Beverage:Tea tag but not verifiable from pixels alone. Sent to human review rather than re-tagged.",
-      assets: 23, active_90d: 14, top_collection: "Product Stills — Ceramics", collection_count: 2, parity_gap: 0
+      rationale: "Confidence below the 75 threshold. Content is consistent with the Component:Gauge tag but not verifiable from pixels alone. Sent to human review rather than re-tagged.",
+      assets: 23, active_90d: 14, top_collection: "Product Stills — Precision Tools", collection_count: 2, parity_gap: 0
     },
     {
       id: "VA-06",
-      file: "matcha_glass_modern.jpg",
-      image: "https://images.unsplash.com/photo-1717398804885-a6c22b3e5c2f?fm=jpg&q=60&w=1200&auto=format&fit=crop",
-      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Beverages", "Tea_Type": "Matcha", "Country": "US" },
-      vision: { summary: "Whisked green matcha preparation in glass with wooden coaster. Composition consistent with Japanese-origin preparation conventions.", confidence: 90 },
-      suggested_tags: { "Country": "JP" },
+      file: "pharma_assay_vial_modern.jpg",
+      image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?fm=jpg&q=60&w=1200&auto=format&fit=crop",
+      current_tags: { "Asset_Sub-Type": "Product", "Industry": "Medical_Cosmetics", "Material": "Pharma-Grade Glass", "Country": "US" },
+      vision: { summary: "Pharmaceutical assay vial with serial label on lab bench. Composition consistent with European GMP preparation conventions.", confidence: 90 },
+      suggested_tags: { "Country": "DE" },
       flag: "RECOMMENDED", severity: "low",
-      rationale: "Country tag (US) conflicts with the cultural register of the preparation. Vision recommends JP. Reviewer to decide: intended market vs. content provenance.",
-      assets: 31, active_90d: 22, top_collection: "Matcha Range — Editorial", collection_count: 3, parity_gap: 28
+      rationale: "Country tag (US) conflicts with manufacturing-origin labeling on the vial. Vision recommends DE. Reviewer to decide: intended market vs. content provenance.",
+      assets: 31, active_90d: 22, top_collection: "Pharma Range — Editorial", collection_count: 3, parity_gap: 28
     }
   ];
 
   /* Concrete brand vocabulary entries — what would populate after a customer
      completes the 3-step onboarding wizard. Sourced from the eval brand_vocab.json. */
   const DNT_LIST = [
-    { term: "Solis Tea",        category: "brand_name",          system: false },
-    { term: "Earl Grey",        category: "product_line",        system: false },
+    { term: "Meridian Industrial Group",        category: "brand_name",          system: false },
+    { term: "MeridianFlow Hydraulics", category: "product_line",        system: false },
     { term: "Japan",            category: "proper_noun",         system: true },
     { term: "United States",    category: "proper_noun",         system: true },
     { term: "Logo",             category: "established_loanword", system: true },
@@ -578,7 +604,7 @@
     { source: "Asset",          de_DE: "Asset",                      fr_FR: "Ressource",                nl_NL: "Middel",                es_ES: "Recurso",
       rationale: "'Actif' is finance register. DAM uses 'ressource' or the EN loanword." },
     { source: "Asset Type",     de_DE: "Asset-Typ",                  fr_FR: "Type de ressource",        nl_NL: "Middel-type",           es_ES: "Tipo de recurso",
-      rationale: "Marketing register; avoid 'Tipo de Activo' / 'Type d'actif' (financial)." },
+      rationale: "Technical register; avoid 'Tipo de Activo' / 'Type d'actif' (financial)." },
     { source: "Fair Use",       de_DE: "Fair Use",                   fr_FR: "Fair Use",                 nl_NL: "Fair Use",              es_ES: "Fair Use",
       rationale: "Legally-loaded EN term; brand context keeps it verbatim." }
   ];
@@ -665,7 +691,7 @@
       mark: 'a',
       name: 'arbitr',
       module: 'Taxonomy Sentry',
-      tenant: 'Solis Tea',
+      tenant: 'Meridian Industrial Group',
       footer: 'arbitr — Trust &amp; Intelligence Platform · Taxonomy Sentry module',
       modeLabel: 'arbitr standalone'
     },
@@ -673,7 +699,7 @@
       mark: 'B',
       name: 'Bynder',
       module: 'Taxonomy',
-      tenant: 'Solis Tea',
+      tenant: 'Meridian Industrial Group',
       footer: 'Bynder · Taxonomy — multilingual alignment',
       modeLabel: 'Bynder embedded'
     }
@@ -688,20 +714,63 @@
     { id: "engagement", label: "Engagement",        icon: "trending-up" }
   ];
 
+  // Multi-tenant brand portfolio (demo: industrial holding-company view)
+  const BRAND_PORTFOLIO = [
+    { id: 'meridian',  name: 'Meridian Industrial Group', meta: 'EN · DE · FR · NL · ES'  },
+    { id: 'apex',      name: 'Apex Manufacturing',         meta: 'EN · DE · ES'             },
+    { id: 'northwind', name: 'Northwind Pharma',           meta: 'EN · DE · FR · ES · IT'   },
+    { id: 'crestline', name: 'Crestline Logistics',        meta: 'EN · DE · NL'             }
+  ];
+  let activeBrandId = (typeof localStorage !== 'undefined' && localStorage.getItem('sentry-active-brand')) || 'meridian';
+  function activeBrand() {
+    return BRAND_PORTFOLIO.find(p => p.id === activeBrandId) || BRAND_PORTFOLIO[0];
+  }
+
   function applyMode() {
     document.documentElement.setAttribute('data-mode', mode);
     if (typeof localStorage !== 'undefined') localStorage.setItem('sentry-mode', mode);
     const b = BRAND[mode];
+    const tenantName = activeBrand().name;
     document.getElementById('brand-block').innerHTML = `
       <span class="brand-mark">${b.mark}</span>
       <span class="text-base">${b.name}</span>
       <span class="brand-divider">·</span>
       <span class="text-base" style="font-weight:500;color:var(--text-2);">${b.module}</span>
       <span class="brand-divider">·</span>
-      <span class="brand-tenant">${b.tenant}</span>
+      <span class="brand-switcher" id="brand-switcher" title="Switch brand (multi-tenant demo)">
+        <span>${tenantName}</span>
+        <i data-lucide="chevron-down"></i>
+      </span>
+      <div class="brand-dropdown" id="brand-dropdown">
+        ${BRAND_PORTFOLIO.map(p => `
+          <div class="brand-option ${p.id === activeBrandId ? 'active' : ''}" data-brand="${p.id}">
+            <span>${p.name}</span>
+            <span class="brand-meta">${p.meta}</span>
+          </div>`).join('')}
+      </div>
     `;
     document.getElementById('footer-brand').innerHTML = b.footer;
     document.getElementById('mode-label').textContent = b.modeLabel;
+    setupBrandSwitcher();
+  }
+
+  function setupBrandSwitcher() {
+    const sw = document.getElementById('brand-switcher');
+    const dd = document.getElementById('brand-dropdown');
+    if (!sw || !dd) return;
+    sw.onclick = (e) => { e.stopPropagation(); dd.classList.toggle('show'); };
+    dd.querySelectorAll('.brand-option').forEach(opt => {
+      opt.onclick = (e) => {
+        e.stopPropagation();
+        activeBrandId = opt.dataset.brand;
+        if (typeof localStorage !== 'undefined') localStorage.setItem('sentry-active-brand', activeBrandId);
+        dd.classList.remove('show');
+        applyMode();
+        lucide.createIcons();
+        render();
+      };
+    });
+    document.addEventListener('click', () => dd.classList.remove('show'), { once: true });
   }
   function setupModeToggle() {
     document.getElementById('mode-toggle').onclick = () => {
@@ -732,13 +801,13 @@
       <div class="fade-in">
         <div style="margin-bottom: 28px;">
           <div style="color: var(--text-2); font-size: 14px;">
-            <strong style="color: var(--text); font-weight: 600;">${TENANT.name}</strong>
+            <strong style="color: var(--text); font-weight: 600;">${activeBrand().name}</strong>
             <span style="color: var(--text-muted);"> is configured for </span>
             <strong style="color: var(--text); font-weight: 500;">DE, FR, NL, ES</strong>
             <span style="color: var(--text-muted);"> · </span>
             <span style="color: var(--text-2);">Brand DAM</span>
             <span style="color: var(--text-muted);"> · </span>
-            <span style="color: var(--text-2);">Marketing register</span>
+            <span style="color: var(--text-2);">Technical register</span>
           </div>
         </div>
 
