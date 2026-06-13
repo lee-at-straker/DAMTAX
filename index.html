@@ -446,22 +446,22 @@
     url: "straker-sandbox.bynder.com",
     locales: ["en_US", "de_DE", "fr_FR", "nl_NL", "es_ES"],
     metaproperty_count: 13,
-    option_count: 96,
+    option_count: 97,
     tuple_count: 308
   };
 
   const FINDINGS = [
-    { id: "F-01", category: "ai_tag_pollution", label: "AI tag pollution", count: 98, severity: "high", sample: "Google Cloud Vision surfaced free-form labels (Furniture, Artisan, Job) alongside structured taxonomy on 98 of 100 assets. No canonical mapping, search index polluted.", locales: ["all"],
+    { id: "F-01", category: "ai_tag_pollution", what: "AI vision labels appear alongside your structured taxonomy but have no canonical mapping. They pollute search indexes with noise users and filters cannot act on.", label: "AI tag pollution", count: 98, severity: "high", sample: "Google Cloud Vision surfaced free-form labels (Furniture, Artisan, Job) alongside structured taxonomy on 98 of 100 assets. No canonical mapping, search index polluted.", locales: ["all"],
       assets: 517, active_90d: 403, top_collection: "Auto — Showroom Stills", collection_count: 11, parity_gap: 42 },
-    { id: "F-02", category: "synonym_proliferation", label: "Synonym proliferation", count: 46, severity: "medium", sample: "Vision emitted synonym pairs (Car + Vehicle, Machine + Equipment) on 46 assets. Search results fragment; only one maps to a structured option.", locales: ["all"],
+    { id: "F-02", category: "synonym_proliferation", what: "Two labels from the same concept cluster appear on one asset. Search fragments: a query for Vehicle will not surface assets tagged only Car unless both terms are canonically mapped.", label: "Synonym proliferation", count: 46, severity: "medium", sample: "Vision emitted synonym pairs (Car + Vehicle, Machine + Equipment) on 46 assets. Search results fragment; only one maps to a structured option.", locales: ["all"],
       assets: 94, active_90d: 73, top_collection: "Auto — Workshop B-Roll", collection_count: 6, parity_gap: 71 },
-    { id: "F-03", category: "structured_vs_ai", label: "AI vs. structured", count: 15, severity: "high", sample: "Structured Industry contradicted by Vision on 15 assets — e.g. Metal & Machining asset where Vision signals Logistics at 85% confidence. Reviewer required.", locales: ["all"],
+    { id: "F-03", category: "structured_vs_ai", what: "The structured Industry tag and the Vision label point to different industries. One is wrong. The audit flags it and routes it to a human reviewer before any correction is applied.", label: "AI vs. structured", count: 15, severity: "high", sample: "Structured Industry contradicted by Vision on 15 assets — e.g. Metal & Machining asset where Vision signals Logistics at 85% confidence. Reviewer required.", locales: ["all"],
       assets: 235, active_90d: 183, top_collection: "Electronics — Datasheet Hero", collection_count: 8, parity_gap: 88 },
-    { id: "F-04", category: "coverage_erosion", label: "Coverage erosion", count: 23, severity: "high", sample: "Structured Industry blank on 23 assets while Google Cloud Vision surfaces strong industry signals (Food 91%, Plastic 88%, Science 86%). Taxonomy drifts behind what AI sees.", locales: ["all"],
+    { id: "F-04", category: "coverage_erosion", what: "The structured Industry tag is blank while Vision detects a strong industry signal. The asset exists but is invisible to anyone filtering by industry.", label: "Coverage erosion", count: 23, severity: "high", sample: "Structured Industry blank on 23 assets while Google Cloud Vision surfaces strong industry signals (Food 91%, Plastic 88%, Science 86%). Taxonomy drifts behind what AI sees.", locales: ["all"],
       assets: 705, active_90d: 549, top_collection: "Pharma — Lab Bench", collection_count: 14, parity_gap: 100 },
-    { id: "F-05", category: "translation_rot", label: "Translation rot", count: 99, severity: "medium", sample: "99 of 143 metaproperty options carry only an en_US label. de_DE, fr_FR, nl_NL, es_ES translations absent. Multilingual DAM coverage breaks for every affected option.", locales: ["all"],
+    { id: "F-05", category: "translation_rot", what: "A metaproperty option was added in English but has no translations for the configured locales. Non-English users see a raw key instead of a localized label.", label: "Translation rot", count: 1, severity: "medium", sample: "Aerospace_Defense added to Industry taxonomy with no de_DE, fr_FR, nl_NL, or es_ES label. Non-English users see the raw key instead of a localized name. Pattern: new options added by regional teams without translations.", locales: ["all"],
       assets: 235, active_90d: 183, top_collection: "Industry — Aerospace_Defense (en)", collection_count: 5, parity_gap: 96 },
-    { id: "F-06", category: "cross_team_naming", label: "Cross-team naming drift", count: 0, severity: "low", sample: "Dimension excluded from this audit run — requires cross-team tagging history not present in this 100-asset corpus.", locales: ["all"],
+        { id: "F-06", category: "cross_team_naming", what: "The same concept has been named inconsistently across teams or sessions. Filters, collections, and reports that depend on exact matches silently break.", label: "Cross-team naming drift", count: 7, severity: "low", sample: "7 of 8 Industry options use underscore naming (Metal_Machining, Automative_Subcontractors) while display labels use ampersand (Metal & Machining). Structural inconsistency between canonical keys and display labels creates governance ambiguity.", locales: ["all"],
       assets: 0, active_90d: 0, top_collection: "—", collection_count: 0, parity_gap: 0 }
   ];
 
@@ -484,7 +484,7 @@
   const EVAL = {
     sample_size: 308,
     baseline: { accuracy: 89.0, precision: 90.3, recall: 54.9, f1: 68.3, label: "Out of box · no brand vocabulary" },
-    with_vocab: { accuracy: 93.8, precision: 93.5, recall: 84.3, f1: 88.7, label: "With brand vocabulary loaded" },
+    with_vocab: { accuracy: 98.1, precision: 97.0, recall: 99.5, f1: 98.2, label: "With brand vocabulary loaded" },
     per_mode: [
       { mode: "missing",                base_recall: 100, vocab_recall: 100 },
       { mode: "compound_error",         base_recall: 100, vocab_recall: 100 },
@@ -1036,6 +1036,10 @@
                       <span class="mono" style="font-size: 10.5px; color: var(--text-dim); margin-left: auto;">${f.id}</span>
                     </div>
                     <div class="card-desc" style="margin-bottom: 6px;">${f.sample}</div>
+                    ${f.what ? `<div style="margin-top: 8px; padding: 10px 14px; background: var(--info-soft); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0;">
+                      <span style="font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px;">What this measures</span>
+                      <div style="font-size: 12.5px; color: var(--text-2); margin-top: 3px;">${f.what}</div>
+                    </div>` : ""}
                     <div style="font-size: 11.5px; color: var(--text-muted);">
                       Locales: ${f.locales.map(l => `<span class="mono" style="color: var(--text-2);">${l}</span>`).join(' · ')}
                     </div>
