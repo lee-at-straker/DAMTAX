@@ -451,9 +451,9 @@
   };
 
   const FINDINGS = [
-    { id: “F-01”, category: “ai_tag_pollution”, label: “AI tag pollution”, count: 98, severity: “high”, sample: “Google Cloud Vision surfaced free-form labels (“Furniture”, “Artisan”, “Job”) alongside structured taxonomy on 98 of 100 assets. No canonical mapping, search index polluted.”, locales: [“all”],
+    { id: “F-01”, category: “ai_tag_pollution”, label: “AI tag pollution”, count: 98, severity: “high”, sample: “Google Cloud Vision surfaced free-form labels (Furniture, Artisan, Job) alongside structured taxonomy on 98 of 100 assets. No canonical mapping, search index polluted.”, locales: [“all”],
       assets: 517, active_90d: 403, top_collection: “Auto — Showroom Stills”, collection_count: 11, parity_gap: 42 },
-    { id: “F-02”, category: “synonym_proliferation”, label: “Synonym proliferation”, count: 46, severity: “medium”, sample: “Vision emitted synonym pairs — “Car” + “Vehicle”, “Machine” + “Equipment” — on 46 assets. Search results fragment; only one maps to a structured option.”, locales: [“all”],
+    { id: “F-02”, category: “synonym_proliferation”, label: “Synonym proliferation”, count: 46, severity: “medium”, sample: “Vision emitted synonym pairs (Car + Vehicle, Machine + Equipment) on 46 assets. Search results fragment; only one maps to a structured option.”, locales: [“all”],
       assets: 94, active_90d: 73, top_collection: “Auto — Workshop B-Roll”, collection_count: 6, parity_gap: 71 },
     { id: “F-03”, category: “structured_vs_ai”, label: “AI vs. structured”, count: 15, severity: “high”, sample: “Structured Industry contradicted by Vision on 15 assets — e.g. Metal & Machining asset where Vision signals Logistics at 85% confidence. Reviewer required.”, locales: [“all”],
       assets: 235, active_90d: 183, top_collection: “Electronics — Datasheet Hero”, collection_count: 8, parity_gap: 88 },
