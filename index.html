@@ -451,18 +451,18 @@
   };
 
   const FINDINGS = [
-    { id: “F-01”, category: “ai_tag_pollution”, label: “AI tag pollution”, count: 98, severity: “high”, sample: “Google Cloud Vision surfaced free-form labels (Furniture, Artisan, Job) alongside structured taxonomy on 98 of 100 assets. No canonical mapping, search index polluted.”, locales: [“all”],
-      assets: 517, active_90d: 403, top_collection: “Auto — Showroom Stills”, collection_count: 11, parity_gap: 42 },
-    { id: “F-02”, category: “synonym_proliferation”, label: “Synonym proliferation”, count: 46, severity: “medium”, sample: “Vision emitted synonym pairs (Car + Vehicle, Machine + Equipment) on 46 assets. Search results fragment; only one maps to a structured option.”, locales: [“all”],
-      assets: 94, active_90d: 73, top_collection: “Auto — Workshop B-Roll”, collection_count: 6, parity_gap: 71 },
-    { id: “F-03”, category: “structured_vs_ai”, label: “AI vs. structured”, count: 15, severity: “high”, sample: “Structured Industry contradicted by Vision on 15 assets — e.g. Metal & Machining asset where Vision signals Logistics at 85% confidence. Reviewer required.”, locales: [“all”],
-      assets: 235, active_90d: 183, top_collection: “Electronics — Datasheet Hero”, collection_count: 8, parity_gap: 88 },
-    { id: “F-04”, category: “coverage_erosion”, label: “Coverage erosion”, count: 23, severity: “high”, sample: “Structured Industry blank on 23 assets while Google Cloud Vision surfaces strong industry signals (Food 91%, Plastic 88%, Science 86%). Taxonomy drifts behind what AI sees.”, locales: [“all”],
-      assets: 705, active_90d: 549, top_collection: “Pharma — Lab Bench”, collection_count: 14, parity_gap: 100 },
-    { id: “F-05”, category: “translation_rot”, label: “Translation rot”, count: 99, severity: “medium”, sample: “99 of 143 metaproperty options carry only an en_US label. de_DE, fr_FR, nl_NL, es_ES translations absent. Multilingual DAM coverage breaks for every affected option.”, locales: [“all”],
-      assets: 235, active_90d: 183, top_collection: “Industry — Aerospace_Defense (en)”, collection_count: 5, parity_gap: 96 },
-    { id: “F-06”, category: “cross_team_naming”, label: “Cross-team naming drift”, count: 0, severity: “low”, sample: “Dimension excluded from this audit run — requires cross-team tagging history not present in this 100-asset corpus.”, locales: [“all”],
-      assets: 0, active_90d: 0, top_collection: “—“, collection_count: 0, parity_gap: 0 }
+    { id: "F-01", category: "ai_tag_pollution", label: "AI tag pollution", count: 98, severity: "high", sample: "Google Cloud Vision surfaced free-form labels (Furniture, Artisan, Job) alongside structured taxonomy on 98 of 100 assets. No canonical mapping, search index polluted.", locales: ["all"],
+      assets: 517, active_90d: 403, top_collection: "Auto — Showroom Stills", collection_count: 11, parity_gap: 42 },
+    { id: "F-02", category: "synonym_proliferation", label: "Synonym proliferation", count: 46, severity: "medium", sample: "Vision emitted synonym pairs (Car + Vehicle, Machine + Equipment) on 46 assets. Search results fragment; only one maps to a structured option.", locales: ["all"],
+      assets: 94, active_90d: 73, top_collection: "Auto — Workshop B-Roll", collection_count: 6, parity_gap: 71 },
+    { id: "F-03", category: "structured_vs_ai", label: "AI vs. structured", count: 15, severity: "high", sample: "Structured Industry contradicted by Vision on 15 assets — e.g. Metal & Machining asset where Vision signals Logistics at 85% confidence. Reviewer required.", locales: ["all"],
+      assets: 235, active_90d: 183, top_collection: "Electronics — Datasheet Hero", collection_count: 8, parity_gap: 88 },
+    { id: "F-04", category: "coverage_erosion", label: "Coverage erosion", count: 23, severity: "high", sample: "Structured Industry blank on 23 assets while Google Cloud Vision surfaces strong industry signals (Food 91%, Plastic 88%, Science 86%). Taxonomy drifts behind what AI sees.", locales: ["all"],
+      assets: 705, active_90d: 549, top_collection: "Pharma — Lab Bench", collection_count: 14, parity_gap: 100 },
+    { id: "F-05", category: "translation_rot", label: "Translation rot", count: 99, severity: "medium", sample: "99 of 143 metaproperty options carry only an en_US label. de_DE, fr_FR, nl_NL, es_ES translations absent. Multilingual DAM coverage breaks for every affected option.", locales: ["all"],
+      assets: 235, active_90d: 183, top_collection: "Industry — Aerospace_Defense (en)", collection_count: 5, parity_gap: 96 },
+    { id: "F-06", category: "cross_team_naming", label: "Cross-team naming drift", count: 0, severity: "low", sample: "Dimension excluded from this audit run — requires cross-team tagging history not present in this 100-asset corpus.", locales: ["all"],
+      assets: 0, active_90d: 0, top_collection: "—", collection_count: 0, parity_gap: 0 }
   ];
 
   const SAMPLE_VERDICT_ROWS = [
