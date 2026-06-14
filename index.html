@@ -447,7 +447,7 @@
     locales: ["en_US", "de_DE", "fr_FR", "nl_NL", "es_ES"],
     metaproperty_count: 13,
     option_count: 97,
-    tuple_count: 308
+    tuple_count: 485
   };
 
   const FINDINGS = [
@@ -482,7 +482,7 @@
   /* Real measured accuracy from the blind eval against the Meridian Industrial Group golden dataset.
      308 items, 4 target locales, classes balanced as described in the eval report. */
   const EVAL = {
-    sample_size: 308,
+    sample_size: 195,
     baseline: { accuracy: 89.0, precision: 90.3, recall: 54.9, f1: 68.3, label: "Out of box · no brand vocabulary" },
     with_vocab: { accuracy: 98.1, precision: 97.0, recall: 99.5, f1: 98.2, label: "With brand vocabulary loaded" },
     per_mode: [
@@ -704,7 +704,6 @@
     { id: "dashboard",  label: "Dashboard",         icon: "layout-dashboard" },
     { id: "vocabulary", label: "Brand Vocabulary",  icon: "book-open" },
     { id: "findings",   label: "Findings",          icon: "search" },
-    { id: "visual",     label: "Visual Audit",      icon: "scan-eye" },
     { id: "governance", label: "Governance",        icon: "shield-check" },
     { id: "engagement", label: "Engagement",        icon: "trending-up" }
   ];
@@ -902,22 +901,6 @@
           </div>
         </div>
 
-        <!-- Visual Audit promo (new layer) -->
-        <div class="hero" style="margin-bottom: 18px; background: linear-gradient(135deg, var(--bg-hero) 0%, var(--accent-soft) 100%); border-color: var(--accent);">
-          <div style="display: flex; align-items: center; gap: 18px; justify-content: space-between;">
-            <div style="display: flex; gap: 16px; align-items: center; flex: 1;">
-              <div class="icon-tile blue" style="width: 48px; height: 48px;"><i data-lucide="scan-eye" class="w-5 h-5"></i></div>
-              <div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <div class="card-title" style="font-size: 15px;">Visual Audit — vision verification on every asset</div>
-                  <span class="flag-pill flag-RECOMMENDED">NEW LAYER</span>
-                </div>
-                <div class="card-desc" style="margin-top: 4px;">${VISUAL_AUDIT.length} sample assets reviewed by a multimodal AI specialist. ${VISUAL_AUDIT.filter(a=>a.flag!=='RESOLVED').length} mistags caught, ${VISUAL_AUDIT.filter(a=>a.flag==='RESOLVED').length} clean. Vision reads the pixels; reviewers approve the writes.</div>
-              </div>
-            </div>
-            <button class="cta-btn" onclick="view='visual'; render();">Open Visual Audit <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
-          </div>
-        </div>
 
         <!-- Tier banner -->
         <div class="card card-row" style="margin-bottom: 24px; cursor: pointer;" onclick="view='engagement'; render();">
@@ -1553,7 +1536,6 @@
     const root = document.getElementById('root');
     if (view === 'dashboard')   root.innerHTML = renderDashboard();
     else if (view === 'findings')   root.innerHTML = renderFindings();
-    else if (view === 'visual')     root.innerHTML = renderVisualAudit();
     else if (view === 'governance') root.innerHTML = renderGovernance();
     else if (view === 'vocabulary') root.innerHTML = renderVocabulary();
     else if (view === 'engagement') root.innerHTML = renderEngagement();
